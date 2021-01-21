@@ -1,0 +1,446 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A11CB7FF25B67BD3001E701A /* YLPTextUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CB7FE25B67BD3001E701A /* YLPTextUtilities.swift */; };
+		A11CB80A25B6ADDD001E701A /* UIViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CB80925B6ADDD001E701A /* UIViewExtension.swift */; };
+		A17C71F525B9155A00E4BA86 /* YLPTextContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C71F425B9155A00E4BA86 /* YLPTextContainerView.swift */; };
+		A17C71FA25B9235500E4BA86 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C71F925B9235500E4BA86 /* UIImageExtension.swift */; };
+		A1FE208425B537D900A3EEFE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE208325B537D900A3EEFE /* AppDelegate.swift */; };
+		A1FE208625B537D900A3EEFE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE208525B537D900A3EEFE /* SceneDelegate.swift */; };
+		A1FE208825B537D900A3EEFE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE208725B537D900A3EEFE /* ViewController.swift */; };
+		A1FE208B25B537D900A3EEFE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A1FE208925B537D900A3EEFE /* Main.storyboard */; };
+		A1FE208D25B537DC00A3EEFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1FE208C25B537DC00A3EEFE /* Assets.xcassets */; };
+		A1FE209025B537DC00A3EEFE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A1FE208E25B537DC00A3EEFE /* LaunchScreen.storyboard */; };
+		A1FE209A25B5397E00A3EEFE /* TextAttributes1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE209925B5397E00A3EEFE /* TextAttributes1ViewController.swift */; };
+		A1FE209E25B53A4D00A3EEFE /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE209D25B53A4D00A3EEFE /* BaseViewController.swift */; };
+		A1FE20A325B53C3400A3EEFE /* YLPTextAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20A225B53C3400A3EEFE /* YLPTextAttribute.swift */; };
+		A1FE20A925B55EEB00A3EEFE /* NSAttributedString+YLPText.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20A825B55EEB00A3EEFE /* NSAttributedString+YLPText.swift */; };
+		A1FE20AD25B5664500A3EEFE /* YLPLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20AC25B5664500A3EEFE /* YLPLabel.swift */; };
+		A1FE20B125B5680000A3EEFE /* YLPTextLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20B025B5680000A3EEFE /* YLPTextLayout.swift */; };
+		A1FE20B425B56A2000A3EEFE /* YLPTextLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20B325B56A2000A3EEFE /* YLPTextLine.swift */; };
+		A1FE20B825B5783600A3EEFE /* YYTextAsyncLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20B725B5783600A3EEFE /* YYTextAsyncLayer.swift */; };
+		A1FE20BB25B5807100A3EEFE /* YYTextDebugOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20BA25B5807100A3EEFE /* YYTextDebugOption.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A11CB7FE25B67BD3001E701A /* YLPTextUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextUtilities.swift; sourceTree = "<group>"; };
+		A11CB80925B6ADDD001E701A /* UIViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtension.swift; sourceTree = "<group>"; };
+		A17C71F425B9155A00E4BA86 /* YLPTextContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextContainerView.swift; sourceTree = "<group>"; };
+		A17C71F925B9235500E4BA86 /* UIImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
+		A1FE208025B537D900A3EEFE /* YLPText.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YLPText.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1FE208325B537D900A3EEFE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A1FE208525B537D900A3EEFE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		A1FE208725B537D900A3EEFE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		A1FE208A25B537D900A3EEFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		A1FE208C25B537DC00A3EEFE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1FE208F25B537DC00A3EEFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A1FE209125B537DC00A3EEFE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1FE209925B5397E00A3EEFE /* TextAttributes1ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextAttributes1ViewController.swift; sourceTree = "<group>"; };
+		A1FE209D25B53A4D00A3EEFE /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
+		A1FE20A225B53C3400A3EEFE /* YLPTextAttribute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextAttribute.swift; sourceTree = "<group>"; };
+		A1FE20A825B55EEB00A3EEFE /* NSAttributedString+YLPText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedString+YLPText.swift"; sourceTree = "<group>"; };
+		A1FE20AC25B5664500A3EEFE /* YLPLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPLabel.swift; sourceTree = "<group>"; };
+		A1FE20B025B5680000A3EEFE /* YLPTextLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextLayout.swift; sourceTree = "<group>"; };
+		A1FE20B325B56A2000A3EEFE /* YLPTextLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextLine.swift; sourceTree = "<group>"; };
+		A1FE20B725B5783600A3EEFE /* YYTextAsyncLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YYTextAsyncLayer.swift; sourceTree = "<group>"; };
+		A1FE20BA25B5807100A3EEFE /* YYTextDebugOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YYTextDebugOption.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1FE207D25B537D900A3EEFE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A17C71F825B9230B00E4BA86 /* YLPImage */ = {
+			isa = PBXGroup;
+			children = (
+				A17C71F925B9235500E4BA86 /* UIImageExtension.swift */,
+			);
+			path = YLPImage;
+			sourceTree = "<group>";
+		};
+		A1FE207725B537D900A3EEFE = {
+			isa = PBXGroup;
+			children = (
+				A1FE208225B537D900A3EEFE /* YLPText */,
+				A1FE208125B537D900A3EEFE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A1FE208125B537D900A3EEFE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1FE208025B537D900A3EEFE /* YLPText.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1FE208225B537D900A3EEFE /* YLPText */ = {
+			isa = PBXGroup;
+			children = (
+				A17C71F825B9230B00E4BA86 /* YLPImage */,
+				A1FE20A025B53BFD00A3EEFE /* YLPText */,
+				A1FE209825B5395800A3EEFE /* Demo */,
+				A1FE208325B537D900A3EEFE /* AppDelegate.swift */,
+				A1FE208525B537D900A3EEFE /* SceneDelegate.swift */,
+				A1FE208725B537D900A3EEFE /* ViewController.swift */,
+				A1FE208925B537D900A3EEFE /* Main.storyboard */,
+				A1FE208C25B537DC00A3EEFE /* Assets.xcassets */,
+				A1FE208E25B537DC00A3EEFE /* LaunchScreen.storyboard */,
+				A1FE209125B537DC00A3EEFE /* Info.plist */,
+			);
+			path = YLPText;
+			sourceTree = "<group>";
+		};
+		A1FE209825B5395800A3EEFE /* Demo */ = {
+			isa = PBXGroup;
+			children = (
+				A1FE209925B5397E00A3EEFE /* TextAttributes1ViewController.swift */,
+				A1FE209D25B53A4D00A3EEFE /* BaseViewController.swift */,
+			);
+			path = Demo;
+			sourceTree = "<group>";
+		};
+		A1FE20A025B53BFD00A3EEFE /* YLPText */ = {
+			isa = PBXGroup;
+			children = (
+				A1FE20AF25B567EA00A3EEFE /* Component */,
+				A1FE20A725B55ED100A3EEFE /* Utility */,
+				A1FE20A125B53C0C00A3EEFE /* String */,
+				A1FE20AC25B5664500A3EEFE /* YLPLabel.swift */,
+				A11CB80925B6ADDD001E701A /* UIViewExtension.swift */,
+			);
+			path = YLPText;
+			sourceTree = "<group>";
+		};
+		A1FE20A125B53C0C00A3EEFE /* String */ = {
+			isa = PBXGroup;
+			children = (
+				A1FE20A225B53C3400A3EEFE /* YLPTextAttribute.swift */,
+			);
+			path = String;
+			sourceTree = "<group>";
+		};
+		A1FE20A725B55ED100A3EEFE /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				A1FE20A825B55EEB00A3EEFE /* NSAttributedString+YLPText.swift */,
+				A1FE20B725B5783600A3EEFE /* YYTextAsyncLayer.swift */,
+				A11CB7FE25B67BD3001E701A /* YLPTextUtilities.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		A1FE20AF25B567EA00A3EEFE /* Component */ = {
+			isa = PBXGroup;
+			children = (
+				A17C71F425B9155A00E4BA86 /* YLPTextContainerView.swift */,
+				A1FE20B025B5680000A3EEFE /* YLPTextLayout.swift */,
+				A1FE20B325B56A2000A3EEFE /* YLPTextLine.swift */,
+				A1FE20BA25B5807100A3EEFE /* YYTextDebugOption.swift */,
+			);
+			path = Component;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1FE207F25B537D900A3EEFE /* YLPText */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1FE209425B537DC00A3EEFE /* Build configuration list for PBXNativeTarget "YLPText" */;
+			buildPhases = (
+				A1FE207C25B537D900A3EEFE /* Sources */,
+				A1FE207D25B537D900A3EEFE /* Frameworks */,
+				A1FE207E25B537D900A3EEFE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = YLPText;
+			productName = YLPText;
+			productReference = A1FE208025B537D900A3EEFE /* YLPText.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1FE207825B537D900A3EEFE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1230;
+				LastUpgradeCheck = 1230;
+				TargetAttributes = {
+					A1FE207F25B537D900A3EEFE = {
+						CreatedOnToolsVersion = 12.3;
+					};
+				};
+			};
+			buildConfigurationList = A1FE207B25B537D900A3EEFE /* Build configuration list for PBXProject "YLPText" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A1FE207725B537D900A3EEFE;
+			productRefGroup = A1FE208125B537D900A3EEFE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1FE207F25B537D900A3EEFE /* YLPText */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1FE207E25B537D900A3EEFE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1FE209025B537DC00A3EEFE /* LaunchScreen.storyboard in Resources */,
+				A1FE208D25B537DC00A3EEFE /* Assets.xcassets in Resources */,
+				A1FE208B25B537D900A3EEFE /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1FE207C25B537D900A3EEFE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1FE20B125B5680000A3EEFE /* YLPTextLayout.swift in Sources */,
+				A1FE209E25B53A4D00A3EEFE /* BaseViewController.swift in Sources */,
+				A1FE20A925B55EEB00A3EEFE /* NSAttributedString+YLPText.swift in Sources */,
+				A1FE20A325B53C3400A3EEFE /* YLPTextAttribute.swift in Sources */,
+				A11CB80A25B6ADDD001E701A /* UIViewExtension.swift in Sources */,
+				A1FE20B425B56A2000A3EEFE /* YLPTextLine.swift in Sources */,
+				A1FE20B825B5783600A3EEFE /* YYTextAsyncLayer.swift in Sources */,
+				A1FE208825B537D900A3EEFE /* ViewController.swift in Sources */,
+				A1FE208425B537D900A3EEFE /* AppDelegate.swift in Sources */,
+				A1FE209A25B5397E00A3EEFE /* TextAttributes1ViewController.swift in Sources */,
+				A1FE20BB25B5807100A3EEFE /* YYTextDebugOption.swift in Sources */,
+				A1FE20AD25B5664500A3EEFE /* YLPLabel.swift in Sources */,
+				A17C71F525B9155A00E4BA86 /* YLPTextContainerView.swift in Sources */,
+				A1FE208625B537D900A3EEFE /* SceneDelegate.swift in Sources */,
+				A11CB7FF25B67BD3001E701A /* YLPTextUtilities.swift in Sources */,
+				A17C71FA25B9235500E4BA86 /* UIImageExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		A1FE208925B537D900A3EEFE /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A1FE208A25B537D900A3EEFE /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		A1FE208E25B537DC00A3EEFE /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A1FE208F25B537DC00A3EEFE /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		A1FE209225B537DC00A3EEFE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A1FE209325B537DC00A3EEFE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A1FE209525B537DC00A3EEFE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MFXJ9AKFM5;
+				INFOPLIST_FILE = YLPText/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cn.yanglipeng.YLPText;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1FE209625B537DC00A3EEFE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MFXJ9AKFM5;
+				INFOPLIST_FILE = YLPText/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cn.yanglipeng.YLPText;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1FE207B25B537D900A3EEFE /* Build configuration list for PBXProject "YLPText" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1FE209225B537DC00A3EEFE /* Debug */,
+				A1FE209325B537DC00A3EEFE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1FE209425B537DC00A3EEFE /* Build configuration list for PBXNativeTarget "YLPText" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1FE209525B537DC00A3EEFE /* Debug */,
+				A1FE209625B537DC00A3EEFE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1FE207825B537D900A3EEFE /* Project object */;
+}
