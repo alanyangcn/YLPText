@@ -54,7 +54,7 @@ struct YYRowEdge {
     var foot: CGFloat = 0
 }
 
-class YLPTextLayout {
+public class YLPTextLayout: NSObject {
     var lines = [YLPTextLine]()
 
     private(set) var container: YLPTextContainer!
@@ -749,7 +749,7 @@ class YLPTextLayout {
         context.restoreGState()
     }
 
-    func draw(in context: CGContext, size: CGSize, point: CGPoint, view: UIView?, layer: CALayer?, debug: YYTextDebugOption?, cancel: (() -> Bool)?) {
+    func draw(in context: CGContext, size: CGSize, point: CGPoint, view: UIView?, layer: CALayer?, debug: YLPTextDebugOption?, cancel: (() -> Bool)?) {
 //        drawShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
         drawText(layout: self, context: context, size: size, point: point, cancel: cancel)
 //        drawInnerShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
