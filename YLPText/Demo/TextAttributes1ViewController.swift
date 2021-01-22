@@ -95,40 +95,118 @@ class TextAttributes1ViewController: BaseViewController {
 //            text.append(one)
 //            text.append(padding())
 //        }
+//        do {
+//            let one = NSMutableAttributedString(string: "Border")
+//            one.ylp_font = UIFont.boldSystemFont(ofSize: 30)
+//            one.ylp_color = UIColor(red: 1.000, green: 0.029, blue: 0.651, alpha: 1.000)
+//
+//            let border = YLPTextBorder()
+//            border.strokeColor = UIColor(red: 1.000, green: 0.029, blue: 0.651, alpha: 1.000)
+//            border.strokeWidth = 3
+//            border.lineStyle = .patternCircleDot
+//            border.cornerRadius = 3
+//            border.insets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: -4)
+//            one.ylp_textBackgroundBorder = border
+//
+////            text.append(padding())
+//            text.append(one)
+////            text.append(padding())
+////            text.append(padding())
+////            text.append(padding())
+////            text.append(padding())
+//        }
         do {
-            let one = NSMutableAttributedString(string: "Border")
+            let one = NSMutableAttributedString(string: "Link")
             one.ylp_font = UIFont.boldSystemFont(ofSize: 30)
-            one.ylp_color = UIColor(red: 1.000, green: 0.029, blue: 0.651, alpha: 1.000)
+            one.ylp_underlineStyle = [.thick];
+            one.ylp_setTextHighlight(range: NSRange(location: 0, length: one.length), color: UIColor(red: 0.093, green: 0.492, blue: 1.000, alpha: 1.000), backgroundColor: UIColor(white: 0.000, alpha: 0.220), userInfo: nil, tap: { _,_,_,_  in
+                
+            }, longPress: nil)
+
+            
+
+                        text.append(one)
+                        text.append(padding())
+        }
+        
+        do {
+            let one = NSMutableAttributedString(string: "Another Link")
+            one.ylp_font = UIFont.boldSystemFont(ofSize: 30)
+            one.ylp_color = UIColor.red
 
             let border = YLPTextBorder()
-            border.strokeColor = UIColor(red: 1.000, green: 0.029, blue: 0.651, alpha: 1.000)
-            border.strokeWidth = 3
-            border.lineStyle = .patternCircleDot
-            border.cornerRadius = 3
-            border.insets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: -4)
+            border.cornerRadius = 50
+            border.insets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: -10)
+            border.strokeWidth = 0.5
+            border.strokeColor = one.ylp_color
+            border.lineStyle = .single
             one.ylp_textBackgroundBorder = border
+
+            let highlightBorder = border.copy() as! YLPTextBorder
+            highlightBorder.strokeWidth = 0
+            highlightBorder.strokeColor = one.ylp_color
+            highlightBorder.fillColor = one.ylp_color
+
+            let highlight = YLPTextHighlight()
+            highlight.setColor(.white)
+            highlight.setBackgroundBorder(highlightBorder)
+            highlight.tapAction = { _,_,_,_ in
+                
+            }
             
-//            text.append(padding())
             text.append(one)
-//            text.append(padding())
-//            text.append(padding())
-//            text.append(padding())
-//            text.append(padding())
+            text.append(padding())
         }
+        
+//        do {
+//            
+//            let one = NSMutableAttributedString(string: "Yet Another Link")
+//            one.ylp_font = UIFont.boldSystemFont(ofSize: 30)
+//            one.ylp_color = UIColor.white
+//
+//            let shadow = YLPTextShadow()
+//            shadow.color = UIColor(white: 0.000, alpha: 0.490)
+//            shadow.offset = CGSize(width: 0, height: 1)
+//            shadow.radius = 5
+//            one.ylp_textShadow = shadow
+//            
+//            let shadow0 = YLPTextShadow()
+//            shadow0.color = UIColor(white: 0.000, alpha: 0.20)
+//            shadow0.offset = CGSize(width: 0, height: -1)
+//            shadow0.radius = 1.5
+//            let shadow1 = YLPTextShadow()
+//            shadow1.color = UIColor(white: 1, alpha: 0.99)
+//            shadow1.offset = CGSize(width: 0, height: 1)
+//            shadow1.radius = 1.5
+//            shadow0.subShadow = shadow1
+//            
+//            let innerShadow0 = YLPTextShadow()
+//            innerShadow0.color = UIColor(red: 0.851, green: 0.311, blue: 0.000, alpha: 0.780)
+//            innerShadow0.offset = CGSize(width: 0, height: 1)
+//            innerShadow0.radius = 1
+//
+//            let highlight = YLPTextHighlight()
+//            highlight.color = UIColor(red: 1.000, green: 0.795, blue: 0.014, alpha: 1.000)
+//            highlight.shadow = shadow0
+//            highlight.innerShadow = innerShadow0
+//            one.yy_setTextHighlight(highlight, range: one.yy_rangeOfAll)
+//            
+//            text.append(one)
+//        }
+        
         let label = YLPLabel()
         label.attributedText = text
         label.width = 200
         label.height = 200
         label.top = 200
         label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: 16)
-        label.font = nil
-        
-        label.centerX = self.view.center.x
-        label.backgroundColor = .lightGray
+        label.textVerticalAlignment = .center
+//        label.centerX = self.view.center.x
+        label.backgroundColor = UIColor(white: 0.93, alpha: 1.0)
         view.addSubview(label)
     }
 
+    
     deinit {
         debugPrint("销毁")
     }

@@ -203,52 +203,156 @@ class YLPTextAttachment: NSObject, NSCoding, NSCopying {
     }
 }
 
-typealias YYTextAction = (UIView?, NSAttributedString?, NSRange, CGRect) -> Void
+class YLPTextDecoration: NSObject, NSCoding, NSCopying {
+    var style: YLPTextLineStyle? /// < line style
+    var width: NSNumber? /// < line width (nil means automatic width)
+    var color: UIColor? /// < line color (nil means automatic color)
+    var shadow: YLPTextShadow? /// < line shadow
 
-class YLPTextHighlight: NSObject, NSCoding, NSCopying {
-    /// Attributes that you can apply to text in an attributed string when highlight.
-    /// Key:   Same as CoreText/YYText Attribute Name.
-    /// Value: Modify attribute value when highlight (NSNull for remove attribute).
-    var attributes: [String : Any?]?
-    /// The user information dictionary, default is nil.
-    var userInfo: [AnyHashable : Any]?
-    /// Tap action when user tap the highlight, default is nil.
-    /// If the value is nil, YYTextView or YYLabel will ask it's delegate to handle the tap action.
-    var tapAction: YYTextAction?
-    /// Long press action when user long press the highlight, default is nil.
-    /// If the value is nil, YYTextView or YYLabel will ask it's delegate to handle the long press action.
-    var longPressAction: YYTextAction?
-
-    func encode(with aCoder: NSCoder) {
-//        var data: Data? = nil
-//        // TODO: import SwiftTryCatch from https://github.com/ypopovych/SwiftTryCatch
-//        SwiftTryCatch.try({
-//            data = YYTextArchiver.archivedData(withRootObject: attributes)
-//        }, catch: { exception in
-//            print("\(exception)")
-//        }, finallyBlock: {
-//        })
-        aCoder.encode(Data(), forKey: "attributes")
+    required init?(coder: NSCoder) {
+        super.init()
     }
 
-    func copy(with zone: NSZone? = nil) -> Any {
-        let one = YLPTextHighlight()
-        one.attributes = self.attributes
-        return one
+    func encode(with coder: NSCoder) {
     }
+
     override init() {
         super.init()
     }
-    required init?(coder aDecoder: NSCoder) {
-        super.init()
-//        let data = aDecoder.decodeObject(forKey: "attributes") as? Data
-//        // TODO: import SwiftTryCatch from https://github.com/ypopovych/SwiftTryCatch
-//        SwiftTryCatch.try({
-//            attributes = YYTextUnarchiver.unarchiveObject(with: data)
-//        }, catch: { exception in
-//            print("\(exception)")
-//        }, finallyBlock: {
-//        })
+
+    func copy(with zone: NSZone? = nil) -> Any {
+        let one = YLPTextDecoration()
+        one.style = style
+        one.width = width
+        one.color = color
+        return one
     }
-    
+}
+ 
+public typealias YLPTextAction = (UIView?, NSAttributedString?, NSRange, CGRect) -> Void
+
+/**
+ YYTextHighlight objects are used by the NSAttributedString class cluster
+ as the values for touchable highlight attributes (stored in the attributed string
+ under the key named YYTextHighlightAttributeName).
+
+ When display an attributed string in `YYLabel` or `YYTextView`, the range of
+ highlight text can be toucheds down by users. If a range of text is turned into
+ highlighted state, the `attributes` in `YYTextHighlight` will be used to modify
+ (set or remove) the original attributes in the range for display.
+ */
+public class YLPTextHighlight: NSObject, NSCoding, NSCopying {
+    /// Attributes that you can apply to text in an attributed string when highlight.
+    /// Key:   Same as CoreText/YYText Attribute Name.
+    /// Value: Modify attribute value when highlight (NSNull for remove attribute).
+    var attributes = [NSAttributedString.Key: Any?]()
+    /// The user information dictionary, default is nil.
+    var userInfo: [AnyHashable: Any]?
+    /// Tap action when user tap the highlight, default is nil.
+    /// If the value is nil, YYTextView or YYLabel will ask it's delegate to handle the tap action.
+    var tapAction: YLPTextAction?
+    /// Long press action when user long press the highlight, default is nil.
+    /// If the value is nil, YYTextView or YYLabel will ask it's delegate to handle the long press action.
+    var longPressAction: YLPTextAction?
+
+    override init() {
+        super.init()
+    }
+
+    convenience init(attributes: [NSAttributedString.Key: Any?]) {
+        self.init()
+        self.attributes = attributes
+    }
+
+    convenience init(backgroundColor: UIColor?) {
+        self.init()
+        let highlightBorder = YLPTextBorder()
+        highlightBorder.insets = UIEdgeInsets(top: -2, left: -1, bottom: -2, right: -1)
+        highlightBorder.cornerRadius = 3
+        highlightBorder.fillColor = backgroundColor
+    }
+
+    public func encode(with aCoder: NSCoder) {
+        aCoder.encode(Data(), forKey: "attributes")
+    }
+
+    required public init?(coder aDecoder: NSCoder) {
+        super.init()
+    }
+
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let one = YLPTextHighlight()
+        one.attributes = attributes
+        return one
+    }
+
+    func setFont(_ font: UIFont?) {
+        if let font = font {
+            attributes[kCTFontAttributeName as NSAttributedString.Key] = font
+
+        } else {
+            attributes[kCTFontAttributeName as NSAttributedString.Key] = nil
+        }
+    }
+
+    func setColor(_ color: UIColor?) {
+        if let color = color {
+            attributes[kCTForegroundColorAttributeName as NSAttributedString.Key] = color.cgColor
+            attributes[.foregroundColor] = color
+        } else {
+            attributes[kCTForegroundColorAttributeName as NSAttributedString.Key] = nil
+            attributes[.foregroundColor] = nil
+        }
+    }
+
+    func setStrokeWidth(_ width: CGFloat?) {
+        if let width = width {
+            attributes[kCTStrokeWidthAttributeName as NSAttributedString.Key] = width
+
+        } else {
+            attributes[kCTStrokeWidthAttributeName as NSAttributedString.Key] = nil
+        }
+    }
+
+    func setStrokeColor(_ color: UIColor?) {
+        if let color = color {
+            attributes[kCTStrokeColorAttributeName as NSAttributedString.Key] = color.cgColor
+            attributes[.strokeColor] = color
+        } else {
+            attributes[kCTStrokeColorAttributeName as NSAttributedString.Key] = nil
+            attributes[.strokeColor] = nil
+        }
+    }
+
+    private func setTextAttribute(attributeName: NSAttributedString.Key, value: Any?) {
+        attributes[attributeName] = value
+    }
+
+    func setShadow(_ shadow: YLPTextShadow?) {
+        setTextAttribute(attributeName: .ylpTextShadow, value: shadow)
+    }
+
+    func setInnerShadow(_ shadow: YLPTextShadow?) {
+        setTextAttribute(attributeName: .ylpTextInnerShadow, value: shadow)
+    }
+
+    func setUnderline(_ underline: YLPTextDecoration?) {
+        setTextAttribute(attributeName: .ylpTextUnderline, value: underline)
+    }
+
+    func setStrikethrough(_ strikethrough: YLPTextDecoration?) {
+        setTextAttribute(attributeName: .ylpTextStrikethrough, value: strikethrough)
+    }
+
+    func setBackgroundBorder(_ border: YLPTextBorder?) {
+        setTextAttribute(attributeName: .ylpTextBackgroundBorder, value: border)
+    }
+
+    func setBorder(_ border: YLPTextBorder?) {
+        setTextAttribute(attributeName: .ylpTextBorder, value: border)
+    }
+
+    func setAttachment(_ attachment: YLPTextAttachment?) {
+        setTextAttribute(attributeName: .ylpTextAttachment, value: attachment)
+    }
 }

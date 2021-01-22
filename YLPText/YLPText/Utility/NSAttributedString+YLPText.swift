@@ -47,6 +47,10 @@ public extension NSAttributedString {
         return getAlignment(at: 0) ?? .natural
     }
 
+    @objc var ylp_underlineStyle: NSUnderlineStyle {
+        return attribute(name: .underlineStyle, at: 0) as? NSUnderlineStyle ?? []
+    }
+
     func attribute(name: NSAttributedString.Key, at index: Int) -> Any? {
         if index >= length || length == 0 {
             return nil
@@ -123,6 +127,15 @@ public extension NSMutableAttributedString {
         }
     }
 
+    override var ylp_underlineStyle: NSUnderlineStyle {
+        set {
+            ylp_set(underlineStyle: newValue, range: NSRange(location: 0, length: length))
+        }
+        get {
+            return attribute(name: .underlineStyle, at: 0) as? NSUnderlineStyle ?? []
+        }
+    }
+
     override var ylp_alignment: NSTextAlignment {
         set {
             ParagraphStyleSet(alignment: newValue, range: NSRange(location: 0, length: length))
@@ -152,8 +165,16 @@ public extension NSMutableAttributedString {
         ylp_setAttribute(name: .ylpTextBackgroundBorder, value: textBackgroundBorder, range: range)
     }
 
+    func ylp_set(underlineStyle: NSUnderlineStyle?, range: NSRange) {
+        ylp_setAttribute(name: .underlineStyle, value: underlineStyle, range: range)
+    }
+
     func ylp_set(paragraphStyle: NSParagraphStyle?, range: NSRange) {
         ylp_setAttribute(name: .paragraphStyle, value: paragraphStyle, range: range)
+    }
+
+    func ylp_set(textHighlight: YLPTextHighlight?, range: NSRange) {
+        ylp_setAttribute(name: .ylpTextHighlight, value: textHighlight, range: range)
     }
 
     func ylp_setAttribute(name: NSAttributedString.Key, value: Any?, range: NSRange) {
@@ -165,13 +186,12 @@ public extension NSMutableAttributedString {
     }
 
     func ParagraphStyleSet(alignment: NSTextAlignment, range: NSRange) {
-        
         enumerateAttribute(.paragraphStyle, in: range, options: [], using: { [self] value, subRange, _ in
             var style: NSMutableParagraphStyle?
             if let value = value as? NSParagraphStyle {
                 if CFGetTypeID(value) == CTParagraphStyleGetTypeID() {
                 }
-                if value.alignment == alignment{
+                if value.alignment == alignment {
                     return
                 }
                 if value is NSMutableParagraphStyle {
@@ -188,5 +208,107 @@ public extension NSMutableAttributedString {
             style?.alignment = alignment
             ylp_set(paragraphStyle: style, range: subRange)
         })
+    }
+
+    func ylp_setTextHighlight(range: NSRange, color: UIColor?, backgroundColor: UIColor?, userInfo: [AnyHashable: Any]?, tap tapAction: YLPTextAction?, longPress longPressAction: YLPTextAction?) {
+        let highlight = YLPTextHighlight(backgroundColor: backgroundColor)
+        highlight.userInfo = userInfo
+        highlight.tapAction = tapAction
+        highlight.longPressAction = longPressAction
+        if let color = color {
+            ylp_set(color: color, range: range)
+        }
+        ylp_set(textHighlight: highlight, range: range)
+    }
+
+    func ylp_setTextHighlight(range: NSRange, color: UIColor?, backgroundColor: UIColor?, tap tapAction: YLPTextAction?) {
+        ylp_setTextHighlight(range: range, color: color, backgroundColor: backgroundColor, userInfo: nil, tap: tapAction, longPress: nil)
+    }
+
+    func ylp_setTextHighlight(range: NSRange, color: UIColor?, backgroundColor: UIColor?, userInfo: [AnyHashable: Any]?) {
+        ylp_setTextHighlight(range: range, color: color, backgroundColor: backgroundColor, userInfo: userInfo, tap: nil, longPress: nil)
+    }
+
+    func ylp_insert(_ string: String, at location: Int) {
+        replaceCharacters(in: NSRange(location: location, length: 0), with: string)
+        ylp_removeDiscontinuousAttributes(in: NSRange(location: location, length: string.count))
+    }
+
+    func ylp_append(_ string: String) {
+        let length = self.length
+        replaceCharacters(in: NSRange(location: length, length: 0), with: string)
+        ylp_removeDiscontinuousAttributes(in: NSRange(location: length, length: string.count))
+    }
+
+    // FIXME: 需要记录操作日志
+//    func yy_setClearColorToJoinedEmoji() {
+//        let str = self.string
+//        if str.count < 8 {
+//            return
+//        }
+//
+//        var containsJoiner = false
+//        do {
+//            let cfStr = str as CFString
+//            var needFree = false
+//            var chars: UniChar? = nil
+//            chars = CFStringGetCharactersPtr(cfStr)
+//            if chars == nil {
+//                chars = malloc(str.length * MemoryLayout<UniChar>.size)
+//                if let chars = chars {
+//                    needFree = true
+//                    CFStringGetCharacters(cfStr, CFRangeMake(CFIndex(0), str.length), UnsafeMutablePointer<UniChar>(mutating: &chars))
+//                }
+//            }
+//            if chars == nil {
+//                // fail to get unichar..
+//                containsJoiner = true
+//            } else {
+//                var i = 0, max = Int(str.length)
+//                while i < max {
+//                    if IntegerLiteralConvertible(chars?[i] ?? 0) == 0x200d {
+//                        // 'ZERO WIDTH JOINER' (U+200D)
+//                        containsJoiner = true
+//                        break
+//                    }
+//                    i += 1
+//                }
+//                if needFree {
+//                    free(chars)
+//                }
+//            }
+//        }
+//
+//        if !containsJoiner {
+//            return
+//        }
+//
+//        // NSRegularExpression is designed to be immutable and thread safe.
+//        private var regex: NSRegularExpression?
+//        // `dispatch_once()` call was converted to a static variable initializer
+//
+//        let clear = UIColor.clear
+//        regex?.enumerateMatches(in: str, options: [], range: NSRange(location: 0, length: str.length), using: { [self] result, flags, stop in
+//            yy_setColor(clear, range: result?.range)
+//        })
+//    }
+
+    func ylp_removeDiscontinuousAttributes(in range: NSRange) {
+        let keys = NSMutableAttributedString.ylp_allDiscontinuousAttributeKeys()
+        for key in keys {
+            removeAttribute(NSAttributedString.Key(key), range: range)
+        }
+    }
+
+    class func ylp_allDiscontinuousAttributeKeys() -> [String] {
+        return [
+            kCTSuperscriptAttributeName as String,
+            kCTRunDelegateAttributeName as String,
+            NSAttributedString.Key.ylpTextBackedString.rawValue,
+            NSAttributedString.Key.ylpTextBinding.rawValue,
+            NSAttributedString.Key.ylpTextAttachment.rawValue,
+            kCTRubyAnnotationAttributeName as String,
+            NSAttributedString.Key.attachment.rawValue,
+        ]
     }
 }

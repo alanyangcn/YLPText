@@ -29,9 +29,14 @@ class YLPLabel: UIView {
     }
     
     
-
+    var numberOfLines: UInt = 0
     private var _innerText = NSMutableAttributedString()
-    private var _innerContainer = YLPTextContainer()
+    private lazy var _innerContainer: YLPTextContainer = {
+        let container = YLPTextContainer()
+        container.truncationType = .end
+        container.maximumNumberOfRows = numberOfLines
+        return container
+    }()
     
     
     var attributedText: NSAttributedString? {
@@ -63,6 +68,7 @@ class YLPLabel: UIView {
                         clearContents()
                     }
                     self._setLayoutNeedUpdate()
+                    self._endTouch()
                     self.invalidateIntrinsicContentSize()
                 }
                 
@@ -83,6 +89,20 @@ class YLPLabel: UIView {
         didSet {
             if oldValue != textAlignment {
                 _innerText.ylp_alignment = textAlignment
+            }
+        }
+    }
+    var textVerticalAlignment: YLPTextVerticalAlignment = .center {
+        didSet {
+            if oldValue != textVerticalAlignment {
+                if _innerText.length > 0, !ignoreCommonProperties {
+                    if displaysAsynchronously && clearContentsBeforeAsynchronouslyDisplay {
+                        clearContents()
+                    }
+                    self._setLayoutNeedUpdate()
+                    self._endTouch()
+                    self.invalidateIntrinsicContentSize()
+                }
             }
         }
     }
@@ -174,12 +194,13 @@ class YLPLabel: UIView {
 extension YLPLabel: YYTextAsyncLayerDelegate {
     func newAsyncDisplayTask() -> YYTextAsyncLayerDisplayTask {
         
-        var text = _innerText;
-        var container = _innerContainer;
+        let text = _innerText;
+        let container = _innerContainer;
         
         let task = YYTextAsyncLayerDisplayTask()
         task.display = { [weak self] (context , size, isCancelled) in
             
+            guard let s = self else { return }
             debugPrint(context, size)
             
             let layoutNeedUpdate = state.layoutNeedUpdate
@@ -187,21 +208,22 @@ extension YLPLabel: YYTextAsyncLayerDelegate {
             if let layout = YLPTextLayout.layout(container: container, text: text) {
                 let boundingSize = layout.textBoundingSize
                 var point = CGPoint.zero
-//                if verticalAlignment == YYTextVerticalAlignmentCenter {
-//                    if drawLayout.container.isVerticalForm {
-//                        point.x = -(size.width - boundingSize.width) * 0.5
-//                    } else {
-//                        point.y = (size.height - boundingSize.height) * 0.5
-//                    }
-//                } else if verticalAlignment == YYTextVerticalAlignmentBottom {
-//                    if drawLayout.container.isVerticalForm {
-//                        point.x = -(size.width - boundingSize.width)
-//                    } else {
-//                        point.y = size.height - boundingSize.height
-//                    }
-//                }
+                let drawLayout = layout
+                if s.textVerticalAlignment == .center {
+                    if drawLayout.container.verticalForm {
+                        point.x = -(size.width - boundingSize.width) * 0.5
+                    } else {
+                        point.y = (size.height - boundingSize.height) * 0.5
+                    }
+                } else if s.textVerticalAlignment == .bottom {
+                    if drawLayout.container.verticalForm {
+                        point.x = -(size.width - boundingSize.width)
+                    } else {
+                        point.y = size.height - boundingSize.height
+                    }
+                }
                 point = YLPTextCGPointPixelRound(point)
-                layout.draw(in: context, size: size, point: point, view: nil, layer: nil, debug: nil, cancel: isCancelled)
+                drawLayout.draw(in: context, size: size, point: point, view: nil, layer: nil, debug: nil, cancel: isCancelled)
             }
             
             

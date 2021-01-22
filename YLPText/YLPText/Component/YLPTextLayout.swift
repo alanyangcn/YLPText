@@ -31,15 +31,27 @@ class YLPTextContainer: NSObject, NSCopying {
     var truncationType = YYTextTruncationType.none
 
     var truncationToken: NSAttributedString?
+    
     func copy(with zone: NSZone? = nil) -> Any {
         let container = YLPTextContainer()
-        container.verticalForm = verticalForm
         container.size = size
+        container.insets = insets
+        container.path = path
+        container.exclusionPaths = exclusionPaths
+        container.pathFillEvenOdd = pathFillEvenOdd
+        container.pathLineWidth = pathLineWidth
+        container.verticalForm = verticalForm
+        container.maximumNumberOfRows = maximumNumberOfRows
+        container.truncationType = truncationType
+        container.truncationToken = truncationToken?.copy() as? NSAttributedString
+        
         return container
     }
 }
 
-class YYRowEdge {
+struct YYRowEdge {
+    var head: CGFloat = 0
+    var foot: CGFloat = 0
 }
 
 class YLPTextLayout {
@@ -99,14 +111,14 @@ class YLPTextLayout {
         var truncationToken: NSAttributedString?
         var truncatedLine: YLPTextLine?
         var lineRowsEdge: YYRowEdge?
-        var lineRowsIndex: UInt = 0
+        let lineRowsIndex: UInt = 0
         var visibleRange: NSRange = NSRange(location: 0, length: 0)
         var maximumNumberOfRows: UInt = 0
         var constraintSizeIsExtended = false
         var constraintRectBeforeExtended: CGRect = .zero
 
-        var text = text.mutableCopy() as! NSMutableAttributedString
-        var container = container.copy() as! YLPTextContainer
+        let text = text.mutableCopy() as! NSMutableAttributedString
+        let container = container.copy() as! YLPTextContainer
 
         if range.location + range.length > text.length {
             return nil
@@ -114,24 +126,8 @@ class YLPTextLayout {
         container.readOnly = true
         maximumNumberOfRows = container.maximumNumberOfRows
 
-//        // CoreText bug when draw joined emoji since iOS 8.3.
-//        // See -[NSMutableAttributedString setClearColorToJoinedEmoji] for more information.
-//        static var needFixJoinedEmojiBug = false
-//        // It may use larger constraint size when create CTFrame with
-//        // CTFramesetterCreateFrame in iOS 10.
-        var needFixLayoutSizeBug = false
-//        {
-//            let systemVersionDouble = Double(UIDevice.current.systemVersion) ?? 0.0
-//            if 8.3 <= systemVersionDouble && systemVersionDouble < 9 {
-//                needFixJoinedEmojiBug = true
-//            }
-//            if systemVersionDouble >= 10 {
-//                needFixLayoutSizeBug = true
-//            }
-//        }
-//        if (needFixJoinedEmojiBug) {
-//            [((NSMutableAttributedString *)text) yy_setClearColorToJoinedEmoji];
-//        }
+
+        let needFixLayoutSizeBug = true
 
         let layout = YLPTextLayout()
         layout.text = text
@@ -146,14 +142,14 @@ class YLPTextLayout {
             }
             var rect = CGRect(origin: .zero, size: container.size)
             if needFixLayoutSizeBug {
-//                constraintSizeIsExtended = true
-//                constraintRectBeforeExtended = UIEdgeInsetsInsetRect(rect, container.insets);
-//                constraintRectBeforeExtended = CGRectStandardize(constraintRectBeforeExtended);
-//                if (container.isVerticalForm) {
-//                    rect.size.width = YYTextContainerMaxSize.width;
-//                } else {
-//                    rect.size.height = YYTextContainerMaxSize.height;
-//                }
+                constraintSizeIsExtended = true
+                constraintRectBeforeExtended = rect.inset(by: container.insets);
+                constraintRectBeforeExtended = constraintRectBeforeExtended.standardized;
+                if (container.verticalForm) {
+                    rect.size.width = 0x100000;
+                } else {
+                    rect.size.height = 0x100000;
+                }
             }
             rect = rect.inset(by: container.insets)
             rect = rect.standardized
@@ -161,7 +157,7 @@ class YLPTextLayout {
             rect = rect.applying(CGAffineTransform(scaleX: 1, y: -1))
             cgPath = CGPath(rect: rect, transform: nil)
         } else if container.path != nil && container.path!.cgPath.isRect(&cgPathBox) && container.exclusionPaths.count == 0 {
-            var rect = cgPathBox.applying(CGAffineTransform(scaleX: 1, y: -1))
+            let rect = cgPathBox.applying(CGAffineTransform(scaleX: 1, y: -1))
             cgPath = CGPath(rect: rect, transform: nil) // let CGPathIsRect() returns true
         } else {
             rowMaySeparated = true
@@ -171,19 +167,17 @@ class YLPTextLayout {
             } else {
                 var rect = CGRect(origin: .zero, size: container.size)
                 rect = rect.inset(by: container.insets)
-                var rectPath = CGPath(rect: rect, transform: nil)
+                let rectPath = CGPath(rect: rect, transform: nil)
                 path = rectPath.mutableCopy()
             }
             if path != nil {
-//                [layout.container.exclusionPaths enumerateObjectsUsingBlock: ^(UIBezierPath *onePath, NSUInteger idx, BOOL *stop) {
-//                    CGPathAddPath(path, NULL, onePath.CGPath);
-//                }];
-
-//                layout.container.exclusionPaths
+                (layout.container.exclusionPaths as NSArray).enumerateObjects({ onePath, idx, stop in
+                    path?.addPath((onePath as? UIBezierPath)!.cgPath, transform: .identity)
+                })
 
                 cgPathBox = path!.boundingBoxOfPath
                 var trans = CGAffineTransform(scaleX: 1, y: -1)
-                var transPath = path!.mutableCopy(using: &trans)
+                let transPath = path!.mutableCopy(using: &trans)
 
                 path = transPath
             }
@@ -309,13 +303,13 @@ class YLPTextLayout {
             rowCount = UInt(rowIdx) + 1
             lineCurrentIdx += 1
 
-//            if i == 0 {
-//                textBoundingRect = rect
-//            } else {
-//                if maximumNumberOfRows == 0 || rowIdx < maximumNumberOfRows {
-//                    textBoundingRect = CGRectUnion(textBoundingRect, rect)
-//                }
-//            }
+            if i == 0 {
+                textBoundingRect = rect
+            } else {
+                if maximumNumberOfRows == 0 || rowIdx < maximumNumberOfRows {
+                    textBoundingRect = textBoundingRect.union(rect)
+                }
+            }
         }
         if rowCount > 0 {
             if maximumNumberOfRows > 0 {
@@ -362,50 +356,51 @@ class YLPTextLayout {
 //            if lineRowsIndex == 0 {
 //                return nil
 //            }
+            var lineRowsEdge = [YYRowEdge].init(repeating: YYRowEdge(head: 0, foot: 0), count: Int(rowCount))
+            var lineRowsIndex = [UInt].init(repeating: 0, count: Int(rowCount))
             var lastRowIdx = -1
             var lastHead: CGFloat = 0
             var lastFoot: CGFloat = 0
-//            for i in 0 ..< lines.count {
-//                var line = lines[i]
-//                var rect = line.bounds
-//                if line.row != lastRowIdx {
-//                    if lastRowIdx >= 0 {
-//                        lineRowsEdge[lastRowIdx] = YYRowEdge { .head = lastHead, .foot = lastFoot }
-//                    }
-//                    lastRowIdx = line.row
-//                    lineRowsIndex[lastRowIdx] = i
-//                    if isVerticalForm {
-//                        lastHead = rect.origin.x + rect.size.width
-//                        lastFoot = lastHead - rect.size.width
-//                    } else {
-//                        lastHead = rect.origin.y
-//                        lastFoot = lastHead + rect.size.height
-//                    }
-//                } else {
-//                    if isVerticalForm {
-//                        lastHead = max(lastHead, rect.origin.x + rect.size.width)
-//                        lastFoot = min(lastFoot, rect.origin.x)
-//                    } else {
-//                        lastHead = min(lastHead, rect.origin.y)
-//                        lastFoot = max(lastFoot, rect.origin.y + rect.size.height)
-//                    }
-//                }
-//            }
-//            lineRowsEdge[lastRowIdx] = YYRowEdge {
-//                .head = lastHead, .foot = lastFoot
-//            }
-//
-//            for i in 0 ..< rowCount {
-//                var v0 = lineRowsEdge[i - 1]
-//                var v1 = lineRowsEdge[i]
-//                lineRowsEdge[i - 1].foot = lineRowsEdge[i].head = (v0.foot + v1.head) * 0.5
-//            }
+            for i in 0 ..< lines.count {
+                var line = lines[i]
+                var rect = line.bounds
+                if line.row != lastRowIdx {
+                    if lastRowIdx >= 0 {
+                        lineRowsEdge[lastRowIdx] = YYRowEdge(head: lastHead, foot: lastFoot)
+                    }
+                    lastRowIdx = line.row
+                    lineRowsIndex[lastRowIdx] = UInt(i)
+                    if isVerticalForm {
+                        lastHead = rect.origin.x + rect.size.width
+                        lastFoot = lastHead - rect.size.width
+                    } else {
+                        lastHead = rect.origin.y
+                        lastFoot = lastHead + rect.size.height
+                    }
+                } else {
+                    if isVerticalForm {
+                        lastHead = max(lastHead, rect.origin.x + rect.size.width)
+                        lastFoot = min(lastFoot, rect.origin.x)
+                    } else {
+                        lastHead = min(lastHead, rect.origin.y)
+                        lastFoot = max(lastFoot, rect.origin.y + rect.size.height)
+                    }
+                }
+            }
+            lineRowsEdge[lastRowIdx] = YYRowEdge(head: lastHead, foot: lastFoot)
+
+            for i in 1 ..< rowCount {
+                let v0 = lineRowsEdge[Int(i) - 1]
+                let v1 = lineRowsEdge[Int(i)]
+                lineRowsEdge[Int(i) - 1].foot = (v0.foot + v1.head) * 0.5
+                lineRowsEdge[Int(i)].head =  (v0.foot + v1.head) * 0.5
+            }
         }
 
         var rect = textBoundingRect
         if container.path != nil {
             if container.pathLineWidth > 0 {
-                var inset = container.pathLineWidth / 2
+                let inset = container.pathLineWidth / 2
                 rect = rect.insetBy(dx: -inset, dy: -inset)
             }
         } else {
@@ -444,33 +439,24 @@ class YLPTextLayout {
                 } else {
                     var runs = CTLineGetGlyphRuns(lastLine!.ctLine)
                     var runCount = CFArrayGetCount(runs)
-                    var attrs: CFDictionary?
-                    //  Converted to Swift 5.3 by Swiftify v5.3.21043 - https://swiftify.com/
+  
                     if runCount > 0 {
-                        let run = CFArrayGetValueAtIndex(runs, CFIndex(runCount - 1)) as! CTRun
-                        attrs = CTRunGetAttributes(run)
-                        attrs = attrs ?? [] as! CFDictionary
-//                        for k in NSMutableAttributedString.yy_allDiscontinuousAttributeKeys() {
-//                            attrs.removeValue(forKey: k)
-//
-//                        }
-//                        var font = CFDictionaryGetValue(attrs!, UnsafePointer(CFDictionaryGetValue))
-//                        var fontSize: CGFloat?
-//                        if let font = font {
-//                            fontSize = font != nil ? CTFontGetSize(font) : 12.0
-//                        }
-//                        var uiFont = UIFont.systemFont(ofSize: (fontSize ?? 0.0) * 0.9)
-//                        if uiFont != nil {
-//                            font = CTFontCreateWithName(uiFont.fontName as CFString, uiFont.pointSize, nil)
-//                        } else {
-//                            font = nil
-//                        }
-//                        if let font = font {
-//                            if let kCTFontAttributeName = kCTFontAttributeName {
-//                                attrs[kCTFontAttributeName] = font
-//                            }
-//                            uiFont = nil
-//                        }
+                        let run = unsafeBitCast(CFArrayGetValueAtIndex(runs, runCount - 1), to: CTRun.self)
+                         
+                        var attrs = CTRunGetAttributes(run) as! [String: Any]
+                        
+                        for k in NSMutableAttributedString.ylp_allDiscontinuousAttributeKeys() {
+                            attrs.removeValue(forKey: k)
+
+                        }
+                        var font = attrs[NSAttributedString.Key.font.rawValue] as? UIFont
+                        var fontSize = font?.pointSize ?? 12
+  
+                        
+                        var uiFont = UIFont.systemFont(ofSize: fontSize * 0.9)
+                        font = UIFont(name: uiFont.fontName, size: fontSize)
+                        attrs[NSAttributedString.Key.font.rawValue] = font
+                        
 //                        let color = attrs[kCTForegroundColorAttributeName] as? CGColor?
 //                        if color != nil && CFGetTypeID(color) == CGColor.typeID && color?.alpha == 0 {
 //                            // ignore clear color
@@ -517,44 +503,33 @@ class YLPTextLayout {
             }
         }
 
-//        if isVerticalForm {
-        ////            var rotateCharset = YYTextVerticalFormRotateCharacterSet()
-        ////            var rotateMoveCharset = YYTextVerticalFormRotateAndMoveCharacterSet()
+        if isVerticalForm {
+        //            var rotateCharset = YYTextVerticalFormRotateCharacterSet()
+        //            var rotateMoveCharset = YYTextVerticalFormRotateAndMoveCharacterSet()
+
+//            let lineBlock: ((YLPTextLine) -> Void)? = { line in
 //
-//            let lineBlock: ((YLPTextLine?) -> Void)? = { line in
-//                var runs: CFArray? = nil
-//                if let CTLine = line?.ctLine {
-//                    runs = CTLineGetGlyphRuns(CTLine)
-//                }
-//                if runs == nil {
-//                    return
-//                }
+//                var runs = CTLineGetGlyphRuns(line.ctLine)
+//
 //                let runCount = CFArrayGetCount(runs)
 //                if runCount == 0 {
 //                    return
 //                }
-//                var lineRunRanges: [AnyHashable] = []
-//                    line?.verticalRotateRange = lineRunRanges
+//                var lineRunRanges =  [[YLPTextRunGlyphRange]]()
+//                    line.verticalRotateRange = lineRunRanges
 //                    for r in 0..<runCount {
-//                        let run = CFArrayGetValueAtIndex(runs, CFIndex(r)) as? CTRun
-//                        var runRanges: [AnyHashable] = []
+//                        let run = unsafeBitCast(CFArrayGetValueAtIndex(runs, r), to: CTRun.self)
+//                        var runRanges = [YLPTextRunGlyphRange]()
 //                        lineRunRanges.append(runRanges)
-//                        var glyphCount: Int? = nil
-//                        if let run = run {
-//                            glyphCount = CTRunGetGlyphCount(run)
-//                        }
+//                        var glyphCount = CTRunGetGlyphCount(run)
 //                        if glyphCount == 0 {
 //                            continue
 //                        }
 //
-//                        let runStrIdx = [CFIndex](repeating: 0, count: (glyphCount ?? 0) + 1)
-//                        if let run = run {
-//                            CTRunGetStringIndices(run, CFRangeMake(CFIndex(0), CFIndex(0)), &runStrIdx)
-//                        }
-//                        var runStrRange: CFRange? = nil
-//                        if let run = run {
-//                            runStrRange = CTRunGetStringRange(run)
-//                        }
+//                        var runStrIdx = glyphCount + 1
+//                        CTRunGetStringIndices(run, CFRangeMake(CFIndex(0), CFIndex(0)), &runStrIdx)
+//
+//                        var runStrRange = CTRunGetStringRange(run)
 //                        runStrIdx[glyphCount ?? 0] = (runStrRange?.location ?? 0) + (runStrRange?.length ?? 0)
 //                        var runAttrs: CFDictionary? = nil
 //                        if let run = run {
@@ -610,39 +585,40 @@ class YLPTextLayout {
 //            if let line = truncatedLine {
 //                lineBlock?(truncatedLine)
 //            }
-//        }
+        }
 
         if visibleRange.length > 0 {
             layout.needDrawText = true
 
-            var block: ((_ attrs: [AnyHashable: Any]?, _ range: NSRange, _ stop: UnsafeMutablePointer<ObjCBool>?) -> Void) = { _, _, _ in
-//                if attrs[YYTextHighlightAttributeName] {
-//                    layout.containsHighlight = true
-//                }
-//                if attrs[YYTextBlockBorderAttributeName] {
-//                    layout.needDrawBlockBorder = true
-//                }
-//                if attrs[YYTextBackgroundBorderAttributeName] {
-//                    layout.needDrawBackgroundBorder = true
-//                }
-//                if attrs[YYTextShadowAttributeName] || attrs[NSShadowAttributeName] {
-//                    layout.needDrawShadow = true
-//                }
-//                if attrs[YYTextUnderlineAttributeName] {
-//                    layout.needDrawUnderline = true
-//                }
-//                if attrs[YYTextAttachmentAttributeName] {
-//                    layout.needDrawAttachment = true
-//                }
-//                if attrs[YYTextInnerShadowAttributeName] {
-//                    layout.needDrawInnerShadow = true
-//                }
-//                if attrs[YYTextStrikethroughAttributeName] {
-//                    layout.needDrawStrikethrough = true
-//                }
-//                if attrs[YYTextBorderAttributeName] {
-//                    layout.needDrawBorder = true
-//                }
+            let block: ((_ attrs: [AnyHashable: Any]?, _ range: NSRange, _ stop: UnsafeMutablePointer<ObjCBool>?) -> Void) = { attrs, _, _ in
+                guard let attrs = attrs else { return }
+                if (attrs[NSAttributedString.Key.ylpTextHighlight] != nil) {
+                    layout.containsHighlight = true
+                }
+                if attrs[NSAttributedString.Key.ylpTextBlockBorder] != nil {
+                    layout.needDrawBlockBorder = true
+                }
+                if attrs[NSAttributedString.Key.ylpTextBackgroundBorder] != nil {
+                    layout.needDrawBackgroundBorder = true
+                }
+                if (attrs[NSAttributedString.Key.ylpTextShadow] != nil) || (attrs[NSAttributedString.Key.shadow] != nil) {
+                    layout.needDrawShadow = true
+                }
+                if (attrs[NSAttributedString.Key.ylpTextUnderline] != nil) {
+                    layout.needDrawUnderline = true
+                }
+                if (attrs[NSAttributedString.Key.ylpTextAttachment] != nil) {
+                    layout.needDrawAttachment = true
+                }
+                if (attrs[NSAttributedString.Key.ylpTextInnerShadow] != nil) {
+                    layout.needDrawInnerShadow = true
+                }
+                if (attrs[NSAttributedString.Key.ylpTextStrikethrough] != nil) {
+                    layout.needDrawStrikethrough = true
+                }
+                if (attrs[NSAttributedString.Key.ylpTextBorder] != nil) {
+                    layout.needDrawBorder = true
+                }
             }
 
             layout.text?.enumerateAttributes(in: visibleRange, options: .longestEffectiveRangeNotRequired, using: block)
@@ -774,10 +750,10 @@ class YLPTextLayout {
     }
 
     func draw(in context: CGContext, size: CGSize, point: CGPoint, view: UIView?, layer: CALayer?, debug: YYTextDebugOption?, cancel: (() -> Bool)?) {
-        drawShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
+//        drawShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
         drawText(layout: self, context: context, size: size, point: point, cancel: cancel)
-        drawInnerShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
-        drawBorder(layout: self, context: context, size: size, point: point, type: .backgound, cancel: cancel)
+//        drawInnerShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
+//        drawBorder(layout: self, context: context, size: size, point: point, type: .backgound, cancel: cancel)
     }
 
     /// 绘制边框
@@ -1204,17 +1180,14 @@ class YLPTextLayout {
                 let lineRunRanges = line.verticalRotateRange
                 let posX = line.position.x + verticalOffset
                 let posY = size.height - line.position.y
-                var runs: CFArray?
-                if let CTLine = line.ctLine {
-                    runs = CTLineGetGlyphRuns(CTLine)
-                }
-                var r = 0, rMax = CFArrayGetCount(runs)
-                while r < rMax {
+                let runs = CTLineGetGlyphRuns(line.ctLine)
+                
+                for r in 0..<CFArrayGetCount(runs) {
                     let run = unsafeBitCast(CFArrayGetValueAtIndex(runs, r), to: CTRun.self)
                     context.textMatrix = .identity
                     context.textPosition = CGPoint(x: posX, y: posY)
                     drawRun(line, run, context, size, isVertical, lineRunRanges?[r], verticalOffset)
-                    r += 1
+                    
                 }
             }
             // Use this to draw frame for test/debug.
@@ -1229,6 +1202,7 @@ class YLPTextLayout {
         let runTextMatrixIsID = runTextMatrix.isIdentity
 
         if let runAttrs = CTRunGetAttributes(run) as? [String: Any?] {
+            
         }
 //        runAttrs[]
 //        let glyphTransformValue = CFDictionaryGetValue(runAttrs, &YYTextGlyphTransformAttributeName) as? NSValue
