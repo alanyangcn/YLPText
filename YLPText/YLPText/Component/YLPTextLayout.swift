@@ -931,7 +931,7 @@ class YLPTextLayout {
                         drawRects.append(curRect)
                     }
 
-                    YYTextDrawBorderRects(context: context, size: size, border: border, rects: drawRects, isVertical: isVertical)
+                    drawBorderRects(context: context, size: size, border: border, rects: drawRects, isVertical: isVertical)
 
                     if l == endLineIndex {
                         r = endRunIndex
@@ -964,7 +964,7 @@ class YLPTextLayout {
         }
     }
 
-    private func YYTextDrawBorderRects(context: CGContext, size: CGSize, border: YLPTextBorder, rects: [CGRect], isVertical: Bool) {
+    private func drawBorderRects(context: CGContext, size: CGSize, border: YLPTextBorder, rects: [CGRect], isVertical: Bool) {
         if rects.count == 0 {
             return
         }

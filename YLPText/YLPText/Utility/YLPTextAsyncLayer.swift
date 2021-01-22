@@ -15,7 +15,7 @@ protocol YYTextAsyncLayerDelegate {
     func newAsyncDisplayTask() -> YYTextAsyncLayerDisplayTask
 }
 
-class YYTextAsyncLayer: CALayer {
+class YLPTextAsyncLayer: CALayer {
     var displaysAsynchronously = true
     var dele: YYTextAsyncLayerDelegate?
     override func display() {

@@ -202,3 +202,53 @@ class YLPTextAttachment: NSObject, NSCoding, NSCopying {
         return one
     }
 }
+
+typealias YYTextAction = (UIView?, NSAttributedString?, NSRange, CGRect) -> Void
+
+class YLPTextHighlight: NSObject, NSCoding, NSCopying {
+    /// Attributes that you can apply to text in an attributed string when highlight.
+    /// Key:   Same as CoreText/YYText Attribute Name.
+    /// Value: Modify attribute value when highlight (NSNull for remove attribute).
+    var attributes: [String : Any?]?
+    /// The user information dictionary, default is nil.
+    var userInfo: [AnyHashable : Any]?
+    /// Tap action when user tap the highlight, default is nil.
+    /// If the value is nil, YYTextView or YYLabel will ask it's delegate to handle the tap action.
+    var tapAction: YYTextAction?
+    /// Long press action when user long press the highlight, default is nil.
+    /// If the value is nil, YYTextView or YYLabel will ask it's delegate to handle the long press action.
+    var longPressAction: YYTextAction?
+
+    func encode(with aCoder: NSCoder) {
+//        var data: Data? = nil
+//        // TODO: import SwiftTryCatch from https://github.com/ypopovych/SwiftTryCatch
+//        SwiftTryCatch.try({
+//            data = YYTextArchiver.archivedData(withRootObject: attributes)
+//        }, catch: { exception in
+//            print("\(exception)")
+//        }, finallyBlock: {
+//        })
+        aCoder.encode(Data(), forKey: "attributes")
+    }
+
+    func copy(with zone: NSZone? = nil) -> Any {
+        let one = YLPTextHighlight()
+        one.attributes = self.attributes
+        return one
+    }
+    override init() {
+        super.init()
+    }
+    required init?(coder aDecoder: NSCoder) {
+        super.init()
+//        let data = aDecoder.decodeObject(forKey: "attributes") as? Data
+//        // TODO: import SwiftTryCatch from https://github.com/ypopovych/SwiftTryCatch
+//        SwiftTryCatch.try({
+//            attributes = YYTextUnarchiver.unarchiveObject(with: data)
+//        }, catch: { exception in
+//            print("\(exception)")
+//        }, finallyBlock: {
+//        })
+    }
+    
+}

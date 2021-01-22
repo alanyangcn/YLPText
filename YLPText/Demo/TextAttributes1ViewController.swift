@@ -121,7 +121,8 @@ class TextAttributes1ViewController: BaseViewController {
         label.height = 200
         label.top = 200
         label.textAlignment = .center
-        
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = nil
         
         label.centerX = self.view.center.x
         label.backgroundColor = .lightGray

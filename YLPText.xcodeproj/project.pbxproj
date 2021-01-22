@@ -9,10 +9,10 @@
 /* Begin PBXBuildFile section */
 		A11CB7FF25B67BD3001E701A /* YLPTextUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CB7FE25B67BD3001E701A /* YLPTextUtilities.swift */; };
 		A11CB80A25B6ADDD001E701A /* UIViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CB80925B6ADDD001E701A /* UIViewExtension.swift */; };
+		A13FEADE25B9847600F91376 /* YYTextArchiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13FEADD25B9847600F91376 /* YYTextArchiver.swift */; };
 		A17C71F525B9155A00E4BA86 /* YLPTextContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C71F425B9155A00E4BA86 /* YLPTextContainerView.swift */; };
 		A17C71FA25B9235500E4BA86 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C71F925B9235500E4BA86 /* UIImageExtension.swift */; };
 		A1FE208425B537D900A3EEFE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE208325B537D900A3EEFE /* AppDelegate.swift */; };
-		A1FE208625B537D900A3EEFE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE208525B537D900A3EEFE /* SceneDelegate.swift */; };
 		A1FE208825B537D900A3EEFE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE208725B537D900A3EEFE /* ViewController.swift */; };
 		A1FE208B25B537D900A3EEFE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A1FE208925B537D900A3EEFE /* Main.storyboard */; };
 		A1FE208D25B537DC00A3EEFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1FE208C25B537DC00A3EEFE /* Assets.xcassets */; };
@@ -24,18 +24,18 @@
 		A1FE20AD25B5664500A3EEFE /* YLPLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20AC25B5664500A3EEFE /* YLPLabel.swift */; };
 		A1FE20B125B5680000A3EEFE /* YLPTextLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20B025B5680000A3EEFE /* YLPTextLayout.swift */; };
 		A1FE20B425B56A2000A3EEFE /* YLPTextLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20B325B56A2000A3EEFE /* YLPTextLine.swift */; };
-		A1FE20B825B5783600A3EEFE /* YYTextAsyncLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20B725B5783600A3EEFE /* YYTextAsyncLayer.swift */; };
+		A1FE20B825B5783600A3EEFE /* YLPTextAsyncLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20B725B5783600A3EEFE /* YLPTextAsyncLayer.swift */; };
 		A1FE20BB25B5807100A3EEFE /* YYTextDebugOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE20BA25B5807100A3EEFE /* YYTextDebugOption.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A11CB7FE25B67BD3001E701A /* YLPTextUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextUtilities.swift; sourceTree = "<group>"; };
 		A11CB80925B6ADDD001E701A /* UIViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtension.swift; sourceTree = "<group>"; };
+		A13FEADD25B9847600F91376 /* YYTextArchiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YYTextArchiver.swift; sourceTree = "<group>"; };
 		A17C71F425B9155A00E4BA86 /* YLPTextContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextContainerView.swift; sourceTree = "<group>"; };
 		A17C71F925B9235500E4BA86 /* UIImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
 		A1FE208025B537D900A3EEFE /* YLPText.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YLPText.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1FE208325B537D900A3EEFE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A1FE208525B537D900A3EEFE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		A1FE208725B537D900A3EEFE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		A1FE208A25B537D900A3EEFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A1FE208C25B537DC00A3EEFE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -48,7 +48,7 @@
 		A1FE20AC25B5664500A3EEFE /* YLPLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPLabel.swift; sourceTree = "<group>"; };
 		A1FE20B025B5680000A3EEFE /* YLPTextLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextLayout.swift; sourceTree = "<group>"; };
 		A1FE20B325B56A2000A3EEFE /* YLPTextLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextLine.swift; sourceTree = "<group>"; };
-		A1FE20B725B5783600A3EEFE /* YYTextAsyncLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YYTextAsyncLayer.swift; sourceTree = "<group>"; };
+		A1FE20B725B5783600A3EEFE /* YLPTextAsyncLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextAsyncLayer.swift; sourceTree = "<group>"; };
 		A1FE20BA25B5807100A3EEFE /* YYTextDebugOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YYTextDebugOption.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -94,7 +94,6 @@
 				A1FE20A025B53BFD00A3EEFE /* YLPText */,
 				A1FE209825B5395800A3EEFE /* Demo */,
 				A1FE208325B537D900A3EEFE /* AppDelegate.swift */,
-				A1FE208525B537D900A3EEFE /* SceneDelegate.swift */,
 				A1FE208725B537D900A3EEFE /* ViewController.swift */,
 				A1FE208925B537D900A3EEFE /* Main.storyboard */,
 				A1FE208C25B537DC00A3EEFE /* Assets.xcassets */,
@@ -129,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				A1FE20A225B53C3400A3EEFE /* YLPTextAttribute.swift */,
+				A13FEADD25B9847600F91376 /* YYTextArchiver.swift */,
 			);
 			path = String;
 			sourceTree = "<group>";
@@ -137,7 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				A1FE20A825B55EEB00A3EEFE /* NSAttributedString+YLPText.swift */,
-				A1FE20B725B5783600A3EEFE /* YYTextAsyncLayer.swift */,
+				A1FE20B725B5783600A3EEFE /* YLPTextAsyncLayer.swift */,
 				A11CB7FE25B67BD3001E701A /* YLPTextUtilities.swift */,
 			);
 			path = Utility;
@@ -230,14 +230,14 @@
 				A1FE20A325B53C3400A3EEFE /* YLPTextAttribute.swift in Sources */,
 				A11CB80A25B6ADDD001E701A /* UIViewExtension.swift in Sources */,
 				A1FE20B425B56A2000A3EEFE /* YLPTextLine.swift in Sources */,
-				A1FE20B825B5783600A3EEFE /* YYTextAsyncLayer.swift in Sources */,
+				A13FEADE25B9847600F91376 /* YYTextArchiver.swift in Sources */,
+				A1FE20B825B5783600A3EEFE /* YLPTextAsyncLayer.swift in Sources */,
 				A1FE208825B537D900A3EEFE /* ViewController.swift in Sources */,
 				A1FE208425B537D900A3EEFE /* AppDelegate.swift in Sources */,
 				A1FE209A25B5397E00A3EEFE /* TextAttributes1ViewController.swift in Sources */,
 				A1FE20BB25B5807100A3EEFE /* YYTextDebugOption.swift in Sources */,
 				A1FE20AD25B5664500A3EEFE /* YLPLabel.swift in Sources */,
 				A17C71F525B9155A00E4BA86 /* YLPTextContainerView.swift in Sources */,
-				A1FE208625B537D900A3EEFE /* SceneDelegate.swift in Sources */,
 				A11CB7FF25B67BD3001E701A /* YLPTextUtilities.swift in Sources */,
 				A17C71FA25B9235500E4BA86 /* UIImageExtension.swift in Sources */,
 			);
@@ -389,6 +389,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MFXJ9AKFM5;
 				INFOPLIST_FILE = YLPText/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -408,6 +409,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MFXJ9AKFM5;
 				INFOPLIST_FILE = YLPText/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
