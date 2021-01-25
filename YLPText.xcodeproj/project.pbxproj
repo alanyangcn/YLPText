@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		A11CB7FF25B67BD3001E701A /* YLPTextUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CB7FE25B67BD3001E701A /* YLPTextUtilities.swift */; };
 		A11CB80A25B6ADDD001E701A /* UIViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CB80925B6ADDD001E701A /* UIViewExtension.swift */; };
+		A132402825BAD67A001CD016 /* YLPTextEffectWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132402725BAD67A001CD016 /* YLPTextEffectWindow.swift */; };
+		A132402B25BAD6AA001CD016 /* YLPTextMagnifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132402A25BAD6AA001CD016 /* YLPTextMagnifier.swift */; };
+		A132402E25BAD70F001CD016 /* YLPTextSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132402D25BAD70F001CD016 /* YLPTextSelectionView.swift */; };
+		A132403225BAD79E001CD016 /* YLPTextInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132403125BAD79E001CD016 /* YLPTextInput.swift */; };
 		A13FEADE25B9847600F91376 /* YYTextArchiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13FEADD25B9847600F91376 /* YYTextArchiver.swift */; };
 		A17C71F525B9155A00E4BA86 /* YLPTextContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C71F425B9155A00E4BA86 /* YLPTextContainerView.swift */; };
 		A17C71FA25B9235500E4BA86 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C71F925B9235500E4BA86 /* UIImageExtension.swift */; };
@@ -31,6 +35,10 @@
 /* Begin PBXFileReference section */
 		A11CB7FE25B67BD3001E701A /* YLPTextUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextUtilities.swift; sourceTree = "<group>"; };
 		A11CB80925B6ADDD001E701A /* UIViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtension.swift; sourceTree = "<group>"; };
+		A132402725BAD67A001CD016 /* YLPTextEffectWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextEffectWindow.swift; sourceTree = "<group>"; };
+		A132402A25BAD6AA001CD016 /* YLPTextMagnifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextMagnifier.swift; sourceTree = "<group>"; };
+		A132402D25BAD70F001CD016 /* YLPTextSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextSelectionView.swift; sourceTree = "<group>"; };
+		A132403125BAD79E001CD016 /* YLPTextInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextInput.swift; sourceTree = "<group>"; };
 		A13FEADD25B9847600F91376 /* YYTextArchiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YYTextArchiver.swift; sourceTree = "<group>"; };
 		A17C71F425B9155A00E4BA86 /* YLPTextContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextContainerView.swift; sourceTree = "<group>"; };
 		A17C71F925B9235500E4BA86 /* UIImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
@@ -150,6 +158,10 @@
 				A1FE20B025B5680000A3EEFE /* YLPTextLayout.swift */,
 				A1FE20B325B56A2000A3EEFE /* YLPTextLine.swift */,
 				A1FE20BA25B5807100A3EEFE /* YLPTextDebugOption.swift */,
+				A132402725BAD67A001CD016 /* YLPTextEffectWindow.swift */,
+				A132402A25BAD6AA001CD016 /* YLPTextMagnifier.swift */,
+				A132402D25BAD70F001CD016 /* YLPTextSelectionView.swift */,
+				A132403125BAD79E001CD016 /* YLPTextInput.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -231,12 +243,16 @@
 				A11CB80A25B6ADDD001E701A /* UIViewExtension.swift in Sources */,
 				A1FE20B425B56A2000A3EEFE /* YLPTextLine.swift in Sources */,
 				A13FEADE25B9847600F91376 /* YYTextArchiver.swift in Sources */,
+				A132403225BAD79E001CD016 /* YLPTextInput.swift in Sources */,
 				A1FE20B825B5783600A3EEFE /* YLPTextAsyncLayer.swift in Sources */,
 				A1FE208825B537D900A3EEFE /* ViewController.swift in Sources */,
 				A1FE208425B537D900A3EEFE /* AppDelegate.swift in Sources */,
 				A1FE209A25B5397E00A3EEFE /* TextAttributes1ViewController.swift in Sources */,
+				A132402B25BAD6AA001CD016 /* YLPTextMagnifier.swift in Sources */,
+				A132402E25BAD70F001CD016 /* YLPTextSelectionView.swift in Sources */,
 				A1FE20BB25B5807100A3EEFE /* YLPTextDebugOption.swift in Sources */,
 				A1FE20AD25B5664500A3EEFE /* YLPLabel.swift in Sources */,
+				A132402825BAD67A001CD016 /* YLPTextEffectWindow.swift in Sources */,
 				A17C71F525B9155A00E4BA86 /* YLPTextContainerView.swift in Sources */,
 				A11CB7FF25B67BD3001E701A /* YLPTextUtilities.swift in Sources */,
 				A17C71FA25B9235500E4BA86 /* UIImageExtension.swift in Sources */,

@@ -14,9 +14,20 @@ struct YLPTextBorderType: OptionSet {
     static let normal = YLPTextBorderType(rawValue: 1 << 1)
 }
 
+/// The YYTextLinePositionModifier protocol declares the required method to modify
+/// the line position in text layout progress. See `YYTextLinePositionSimpleModifier` for example.
+protocol YLPTextLinePositionModifier: NSObjectProtocol, NSCopying {
+    /// This method will called before layout is completed. The method should be thread-safe.
+    /// - Parameters:
+    ///   - lines:     An array of YYTextLine.
+    ///   - text:      The full text.
+    ///   - container: The layout container.
+    func modifyLines(_ lines: [YLPTextLine]?, fromText text: NSAttributedString?, in container: YLPTextContainer?)
+}
+
 class YLPTextContainer: NSObject, NSCopying {
     var readOnly = false
-    var verticalForm: Bool = false
+    var isVerticalForm: Bool = false
     var size: CGSize = .zero
     var insets: UIEdgeInsets = .zero
     var maximumNumberOfRows: UInt = 0
@@ -31,7 +42,8 @@ class YLPTextContainer: NSObject, NSCopying {
     var truncationType = YYTextTruncationType.none
 
     var truncationToken: NSAttributedString?
-    
+
+    weak var linePositionModifier: YLPTextLinePositionModifier?
     func copy(with zone: NSZone? = nil) -> Any {
         let container = YLPTextContainer()
         container.size = size
@@ -40,11 +52,11 @@ class YLPTextContainer: NSObject, NSCopying {
         container.exclusionPaths = exclusionPaths
         container.pathFillEvenOdd = pathFillEvenOdd
         container.pathLineWidth = pathLineWidth
-        container.verticalForm = verticalForm
+        container.isVerticalForm = isVerticalForm
         container.maximumNumberOfRows = maximumNumberOfRows
         container.truncationType = truncationType
         container.truncationToken = truncationToken?.copy() as? NSAttributedString
-        
+
         return container
     }
 }
@@ -126,14 +138,13 @@ public class YLPTextLayout: NSObject {
         container.readOnly = true
         maximumNumberOfRows = container.maximumNumberOfRows
 
-
         let needFixLayoutSizeBug = true
 
         let layout = YLPTextLayout()
         layout.text = text
         layout.container = container
         layout.range = range
-        isVerticalForm = container.verticalForm
+        isVerticalForm = container.isVerticalForm
 
         // set cgPath and cgPathBox
         if container.path == nil && container.exclusionPaths.count == 0 {
@@ -143,12 +154,12 @@ public class YLPTextLayout: NSObject {
             var rect = CGRect(origin: .zero, size: container.size)
             if needFixLayoutSizeBug {
                 constraintSizeIsExtended = true
-                constraintRectBeforeExtended = rect.inset(by: container.insets);
-                constraintRectBeforeExtended = constraintRectBeforeExtended.standardized;
-                if (container.verticalForm) {
-                    rect.size.width = 0x100000;
+                constraintRectBeforeExtended = rect.inset(by: container.insets)
+                constraintRectBeforeExtended = constraintRectBeforeExtended.standardized
+                if container.isVerticalForm {
+                    rect.size.width = 0x100000
                 } else {
-                    rect.size.height = 0x100000;
+                    rect.size.height = 0x100000
                 }
             }
             rect = rect.inset(by: container.insets)
@@ -171,7 +182,7 @@ public class YLPTextLayout: NSObject {
                 path = rectPath.mutableCopy()
             }
             if path != nil {
-                (layout.container.exclusionPaths as NSArray).enumerateObjects({ onePath, idx, stop in
+                (layout.container.exclusionPaths as NSArray).enumerateObjects({ onePath, _, _ in
                     path?.addPath((onePath as? UIBezierPath)!.cgPath, transform: .identity)
                 })
 
@@ -193,7 +204,7 @@ public class YLPTextLayout: NSObject {
         if container.pathLineWidth > 0 {
             frameAttrs[kCTFramePathWidthAttributeName] = container.pathLineWidth
         }
-        if container.verticalForm {
+        if container.isVerticalForm {
             frameAttrs[kCTFrameProgressionAttributeName] = CTFrameProgression.rightToLeft
         }
 
@@ -317,7 +328,7 @@ public class YLPTextLayout: NSObject {
                     needTruncation = true
                     rowCount = maximumNumberOfRows
                     repeat {
-                        var line = lines.last
+                        let line = lines.last
                         if line == nil {
                             break
                         }
@@ -335,18 +346,19 @@ public class YLPTextLayout: NSObject {
             }
 
             // Give user a chance to modify the line's position.
-//            if container.linePositionModifier {
-//                [container.linePositionModifier modifyLines: lines fromText: text inContainer: container]
-//                textBoundingRect = CGRectZero
-//                for i in 0 ..< lines.count {
-//                    var line = lines[i]
-//                    if i == 0 {
-//                        textBoundingRect = line.bounds
-//                    } else {
-//                        textBoundingRect = textBoundingRect.union(line.bounds)
-//                    }
-//                }
-//            }
+            if container.linePositionModifier != nil {
+                container.linePositionModifier?.modifyLines(lines, fromText: text, in: container)
+
+                textBoundingRect = .zero
+                for i in 0 ..< lines.count {
+                    var line = lines[i]
+                    if i == 0 {
+                        textBoundingRect = line.bounds
+                    } else {
+                        textBoundingRect = textBoundingRect.union(line.bounds)
+                    }
+                }
+            }
 //
 //            lineRowsEdge = calloc(rowCount, sizeof(YYRowEdge))
 //            if lineRowsEdge == nil {
@@ -393,7 +405,7 @@ public class YLPTextLayout: NSObject {
                 let v0 = lineRowsEdge[Int(i) - 1]
                 let v1 = lineRowsEdge[Int(i)]
                 lineRowsEdge[Int(i) - 1].foot = (v0.foot + v1.head) * 0.5
-                lineRowsEdge[Int(i)].head =  (v0.foot + v1.head) * 0.5
+                lineRowsEdge[Int(i)].head = (v0.foot + v1.head) * 0.5
             }
         }
 
@@ -408,7 +420,7 @@ public class YLPTextLayout: NSObject {
         }
         rect = rect.standardized
         var size = rect.size
-        if container.verticalForm {
+        if container.isVerticalForm {
             size.width += container.size.width - (rect.origin.x + rect.size.width)
         } else {
             size.width += rect.origin.x
@@ -439,24 +451,22 @@ public class YLPTextLayout: NSObject {
                 } else {
                     var runs = CTLineGetGlyphRuns(lastLine!.ctLine)
                     var runCount = CFArrayGetCount(runs)
-  
+
                     if runCount > 0 {
                         let run = unsafeBitCast(CFArrayGetValueAtIndex(runs, runCount - 1), to: CTRun.self)
-                         
+
                         var attrs = CTRunGetAttributes(run) as! [String: Any]
-                        
+
                         for k in NSMutableAttributedString.ylp_allDiscontinuousAttributeKeys() {
                             attrs.removeValue(forKey: k)
-
                         }
                         var font = attrs[NSAttributedString.Key.font.rawValue] as? UIFont
                         var fontSize = font?.pointSize ?? 12
-  
-                        
+
                         var uiFont = UIFont.systemFont(ofSize: fontSize * 0.9)
                         font = UIFont(name: uiFont.fontName, size: fontSize)
                         attrs[NSAttributedString.Key.font.rawValue] = font
-                        
+
 //                        let color = attrs[kCTForegroundColorAttributeName] as? CGColor?
 //                        if color != nil && CFGetTypeID(color) == CGColor.typeID && color?.alpha == 0 {
 //                            // ignore clear color
@@ -504,8 +514,8 @@ public class YLPTextLayout: NSObject {
         }
 
         if isVerticalForm {
-        //            var rotateCharset = YYTextVerticalFormRotateCharacterSet()
-        //            var rotateMoveCharset = YYTextVerticalFormRotateAndMoveCharacterSet()
+            //            var rotateCharset = YYTextVerticalFormRotateCharacterSet()
+            //            var rotateMoveCharset = YYTextVerticalFormRotateAndMoveCharacterSet()
 
 //            let lineBlock: ((YLPTextLine) -> Void)? = { line in
 //
@@ -592,7 +602,7 @@ public class YLPTextLayout: NSObject {
 
             let block: ((_ attrs: [AnyHashable: Any]?, _ range: NSRange, _ stop: UnsafeMutablePointer<ObjCBool>?) -> Void) = { attrs, _, _ in
                 guard let attrs = attrs else { return }
-                if (attrs[NSAttributedString.Key.ylpTextHighlight] != nil) {
+                if attrs[NSAttributedString.Key.ylpTextHighlight] != nil {
                     layout.containsHighlight = true
                 }
                 if attrs[NSAttributedString.Key.ylpTextBlockBorder] != nil {
@@ -604,19 +614,19 @@ public class YLPTextLayout: NSObject {
                 if (attrs[NSAttributedString.Key.ylpTextShadow] != nil) || (attrs[NSAttributedString.Key.shadow] != nil) {
                     layout.needDrawShadow = true
                 }
-                if (attrs[NSAttributedString.Key.ylpTextUnderline] != nil) {
+                if attrs[NSAttributedString.Key.ylpTextUnderline] != nil {
                     layout.needDrawUnderline = true
                 }
-                if (attrs[NSAttributedString.Key.ylpTextAttachment] != nil) {
+                if attrs[NSAttributedString.Key.ylpTextAttachment] != nil {
                     layout.needDrawAttachment = true
                 }
-                if (attrs[NSAttributedString.Key.ylpTextInnerShadow] != nil) {
+                if attrs[NSAttributedString.Key.ylpTextInnerShadow] != nil {
                     layout.needDrawInnerShadow = true
                 }
-                if (attrs[NSAttributedString.Key.ylpTextStrikethrough] != nil) {
+                if attrs[NSAttributedString.Key.ylpTextStrikethrough] != nil {
                     layout.needDrawStrikethrough = true
                 }
-                if (attrs[NSAttributedString.Key.ylpTextBorder] != nil) {
+                if attrs[NSAttributedString.Key.ylpTextBorder] != nil {
                     layout.needDrawBorder = true
                 }
             }
@@ -669,7 +679,7 @@ public class YLPTextLayout: NSObject {
         context.saveGState()
         context.translateBy(x: point.x, y: point.y)
 
-        let isVertical = layout.container.verticalForm
+        let isVertical = layout.container.isVerticalForm
         let verticalOffset = isVertical ? (size.width - layout.container!.size.width) : 0
 
         let lines = layout.lines
@@ -749,11 +759,33 @@ public class YLPTextLayout: NSObject {
         context.restoreGState()
     }
 
-    func draw(in context: CGContext, size: CGSize, point: CGPoint, view: UIView?, layer: CALayer?, debug: YLPTextDebugOption?, cancel: (() -> Bool)?) {
-//        drawShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
-        drawText(layout: self, context: context, size: size, point: point, cancel: cancel)
-//        drawInnerShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
-//        drawBorder(layout: self, context: context, size: size, point: point, type: .backgound, cancel: cancel)
+    func draw(in context: CGContext?, size: CGSize, point: CGPoint, view: UIView?, layer: CALayer?, debug: YLPTextDebugOption?, cancel: (() -> Bool)?) {
+        if let context = context {
+            if needDrawBlockBorder {
+            }
+            if needDrawBackgroundBorder {
+            }
+            if needDrawShadow {
+                drawShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
+            }
+            if needDrawUnderline {
+            }
+            if needDrawText {
+                drawText(layout: self, context: context, size: size, point: point, cancel: cancel)
+            }
+            if needDrawAttachment {
+            }
+            if needDrawInnerShadow {
+                drawInnerShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
+            }
+            if needDrawStrikethrough {
+            }
+            if needDrawBorder {
+                drawBorder(layout: self, context: context, size: size, point: point, type: .backgound, cancel: cancel)
+            }
+            if let debug = debug, debug.needDrawDebug() {
+            }
+        }
     }
 
     /// 绘制边框
@@ -767,7 +799,7 @@ public class YLPTextLayout: NSObject {
         context.saveGState()
         context.translateBy(x: point.x, y: point.y)
 
-        let isVertical = layout.container.verticalForm
+        let isVertical = layout.container.isVerticalForm
         let verticalOffset: CGFloat = isVertical ? (size.width - layout.container.size.width) : 0
 
         let borderKey: NSAttributedString.Key = (type == YLPTextBorderType.normal ? .ylpTextBorder : .ylpTextBackgroundBorder)
@@ -1091,12 +1123,6 @@ public class YLPTextLayout: NSObject {
         }
     }
 
-    @inline(__always) private func YLPTextCGRectPixelRound(_ rect: CGRect) -> CGRect {
-        let origin = YLPTextCGPointPixelRound(rect.origin)
-        let corner = YLPTextCGPointPixelRound(CGPoint(x: rect.origin.x + rect.size.width, y: rect.origin.y + rect.size.height))
-        return CGRect(x: origin.x, y: origin.y, width: corner.x - origin.x, height: corner.y - origin.y)
-    }
-
     /// 绘制阴影
     /// - Parameters:
     ///   - layout: layout
@@ -1107,7 +1133,7 @@ public class YLPTextLayout: NSObject {
     func drawShadow(layout: YLPTextLayout, context: CGContext, size: CGSize, point: CGPoint, cancel: (() -> Bool)?) {
         let offsetAlterX: CGFloat = size.width + 0xFFFF
 
-        let isVertical = layout.container!.verticalForm
+        let isVertical = layout.container!.isVerticalForm
         let verticalOffset: CGFloat = isVertical ? (size.width - layout.container!.size.width) : 0
 
         context.saveGState()
@@ -1169,7 +1195,7 @@ public class YLPTextLayout: NSObject {
             context.translateBy(x: 0, y: size.height)
             context.scaleBy(x: 1, y: -1)
 
-            let isVertical = layout.container?.verticalForm ?? false
+            let isVertical = layout.container?.isVerticalForm ?? false
             let verticalOffset = isVertical ? (size.width - (layout.container?.size.width ?? 0.0)) : 0
 
             for l in 0 ..< layout.lines.count {
@@ -1181,13 +1207,12 @@ public class YLPTextLayout: NSObject {
                 let posX = line.position.x + verticalOffset
                 let posY = size.height - line.position.y
                 let runs = CTLineGetGlyphRuns(line.ctLine)
-                
-                for r in 0..<CFArrayGetCount(runs) {
+
+                for r in 0 ..< CFArrayGetCount(runs) {
                     let run = unsafeBitCast(CFArrayGetValueAtIndex(runs, r), to: CTRun.self)
                     context.textMatrix = .identity
                     context.textPosition = CGPoint(x: posX, y: posY)
                     drawRun(line, run, context, size, isVertical, lineRunRanges?[r], verticalOffset)
-                    
                 }
             }
             // Use this to draw frame for test/debug.
@@ -1202,7 +1227,6 @@ public class YLPTextLayout: NSObject {
         let runTextMatrixIsID = runTextMatrix.isIdentity
 
         if let runAttrs = CTRunGetAttributes(run) as? [String: Any?] {
-            
         }
 //        runAttrs[]
 //        let glyphTransformValue = CFDictionaryGetValue(runAttrs, &YYTextGlyphTransformAttributeName) as? NSValue
@@ -1219,7 +1243,7 @@ public class YLPTextLayout: NSObject {
         context.scaleBy(x: 1, y: -1)
         context.textMatrix = .identity
 
-        let isVertical = layout.container.verticalForm
+        let isVertical = layout.container.isVerticalForm
         let verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0
 
         for l in 0 ..< layout.lines.count {

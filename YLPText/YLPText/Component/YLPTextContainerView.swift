@@ -91,13 +91,13 @@ public class YLPTextContainerView: UIView {
         let boundingSize = layout.textBoundingSize
         var point = CGPoint.zero
         if textVerticalAlignment == .center {
-            if layout.container.verticalForm {
+            if layout.container.isVerticalForm {
                 point.x = -(bounds.size.width - boundingSize.width) * 0.5
             } else {
                 point.y = (bounds.size.height - boundingSize.height) * 0.5
             }
         } else if textVerticalAlignment == .bottom {
-            if layout.container.verticalForm {
+            if layout.container.isVerticalForm {
                 point.x = -(bounds.size.width - boundingSize.width)
             } else {
                 point.y = bounds.size.height - boundingSize.height

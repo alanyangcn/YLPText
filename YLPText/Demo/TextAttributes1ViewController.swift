@@ -196,9 +196,9 @@ class TextAttributes1ViewController: BaseViewController {
         
         let label = YLPLabel()
         label.attributedText = text
-        label.width = 200
-        label.height = 200
-        label.top = 200
+        label.width = self.view.width
+        label.height = self.view.height - 88
+        label.top = 88
         label.textAlignment = .center
         label.textVerticalAlignment = .center
 //        label.centerX = self.view.center.x

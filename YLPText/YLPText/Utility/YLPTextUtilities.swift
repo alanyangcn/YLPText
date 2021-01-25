@@ -27,3 +27,14 @@ func edgeInsetRotateVertical(_ insets: UIEdgeInsets) -> UIEdgeInsets {
 
     return UIEdgeInsets(top: insets.left, left: insets.bottom, bottom: insets.right, right: insets.top)
 }
+func YLPTextCGPointGetDistanceToPoint(_ p1: CGPoint, _ p2: CGPoint) -> CGFloat {
+    return sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
+}
+func YLPTextCGRectGetCenter(_ rect: CGRect) -> CGPoint {
+    return CGPoint(x: rect.midX, y: rect.midY)
+}
+func YLPTextCGRectPixelRound(_ rect: CGRect) -> CGRect {
+    let origin = YLPTextCGPointPixelRound(rect.origin)
+    let corner = YLPTextCGPointPixelRound(CGPoint(x: rect.origin.x + rect.size.width, y: rect.origin.y + rect.size.height))
+    return CGRect(x: origin.x, y: origin.y, width: corner.x - origin.x, height: corner.y - origin.y)
+}

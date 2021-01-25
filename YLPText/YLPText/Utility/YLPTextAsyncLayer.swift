@@ -7,8 +7,39 @@
 
 import UIKit
 
+/**
+ A display task used by YYTextAsyncLayer to render the contents in background queue.
+ */
 class YYTextAsyncLayerDisplayTask {
+    /**
+     This block will be called before the asynchronous drawing begins.
+     It will be called on the main thread.
+     
+     block param layer: The layer.
+     */
+    var willDisplay: ((_ layer: CALayer?) -> Void)?
+    
+    /**
+     This block is called to draw the layer's contents.
+     
+     @discussion This block may be called on main thread or background thread,
+     so is should be thread-safe.
+     
+     block param context:      A new bitmap content created by layer.
+     block param size:         The content size (typically same as layer's bound size).
+     block param isCancelled:  If this block returns `YES`, the method should cancel the
+     drawing process and return as quickly as possible.
+     */
     var display: ((CGContext, CGSize, @escaping () -> Bool) -> Void)?
+    
+    /**
+     This block will be called after the asynchronous drawing finished.
+     It will be called on the main thread.
+     
+     block param layer:  The layer.
+     block param finished:  If the draw process is cancelled, it's `NO`, otherwise it's `YES`;
+     */
+    var didDisplay: ((_ layer: CALayer?, _ finished: Bool) -> Void)?
 }
 
 protocol YYTextAsyncLayerDelegate {
@@ -19,6 +50,16 @@ class YLPTextAsyncLayer: CALayer {
     
     var displaysAsynchronously = true
     var dele: YYTextAsyncLayerDelegate?
+    
+    override init() {
+        super.init()
+        
+        self.contentsScale = UIScreen.main.scale
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func display() {
         super.contents = super.contents
