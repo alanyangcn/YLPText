@@ -14,6 +14,7 @@
 		A132402E25BAD70F001CD016 /* YLPTextSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132402D25BAD70F001CD016 /* YLPTextSelectionView.swift */; };
 		A132403225BAD79E001CD016 /* YLPTextInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132403125BAD79E001CD016 /* YLPTextInput.swift */; };
 		A13FEADE25B9847600F91376 /* YYTextArchiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13FEADD25B9847600F91376 /* YYTextArchiver.swift */; };
+		A1697F1125C2495700FD1676 /* YLPTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1697F1025C2495700FD1676 /* YLPTextView.swift */; };
 		A17C71F525B9155A00E4BA86 /* YLPTextContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C71F425B9155A00E4BA86 /* YLPTextContainerView.swift */; };
 		A17C71FA25B9235500E4BA86 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C71F925B9235500E4BA86 /* UIImageExtension.swift */; };
 		A1A9138C25C10DD900BCD202 /* YLPTextKeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A9138B25C10DD900BCD202 /* YLPTextKeyboardManager.swift */; };
@@ -49,6 +50,7 @@
 		A132402D25BAD70F001CD016 /* YLPTextSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextSelectionView.swift; sourceTree = "<group>"; };
 		A132403125BAD79E001CD016 /* YLPTextInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextInput.swift; sourceTree = "<group>"; };
 		A13FEADD25B9847600F91376 /* YYTextArchiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YYTextArchiver.swift; sourceTree = "<group>"; };
+		A1697F1025C2495700FD1676 /* YLPTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextView.swift; sourceTree = "<group>"; };
 		A17C71F425B9155A00E4BA86 /* YLPTextContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextContainerView.swift; sourceTree = "<group>"; };
 		A17C71F925B9235500E4BA86 /* UIImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
 		A1A9138B25C10DD900BCD202 /* YLPTextKeyboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YLPTextKeyboardManager.swift; sourceTree = "<group>"; };
@@ -142,9 +144,10 @@
 			isa = PBXGroup;
 			children = (
 				A1FE20AF25B567EA00A3EEFE /* Component */,
-				A1FE20A725B55ED100A3EEFE /* Utility */,
 				A1FE20A125B53C0C00A3EEFE /* String */,
+				A1FE20A725B55ED100A3EEFE /* Utility */,
 				A1FE20AC25B5664500A3EEFE /* YLPLabel.swift */,
+				A1697F1025C2495700FD1676 /* YLPTextView.swift */,
 				A11CB80925B6ADDD001E701A /* UIViewExtension.swift */,
 			);
 			path = YLPText;
@@ -278,6 +281,7 @@
 				A1FE208425B537D900A3EEFE /* AppDelegate.swift in Sources */,
 				A1A9139425C10E3500BCD202 /* YLPTextRubyAnnotation.swift in Sources */,
 				A1A913A725C10E9F00BCD202 /* YLPTextWeakProxy.swift in Sources */,
+				A1697F1125C2495700FD1676 /* YLPTextView.swift in Sources */,
 				A1FE209A25B5397E00A3EEFE /* TextAttributes1ViewController.swift in Sources */,
 				A1A9139125C10E2800BCD202 /* YLPTextRunDelegate.swift in Sources */,
 				A1A9139A25C10E6600BCD202 /* NSParagraphStyle+YLPText.swift in Sources */,

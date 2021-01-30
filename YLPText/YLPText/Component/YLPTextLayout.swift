@@ -95,8 +95,8 @@ public class YLPTextLayout: NSObject {
     private(set) var needDrawInnerShadow = false
     private(set) var needDrawStrikethrough = false
     private(set) var needDrawBorder = false
-    private var lineRowsIndex: UInt = 0
-    private var lineRowsEdge: YYRowEdge? /// < top-left origin
+    private var lineRowsIndex = [UInt]()
+    private var lineRowsEdge = [YYRowEdge]()
     static func layout(container: YLPTextContainer, text: NSAttributedString) -> YLPTextLayout? {
         return layout(container: container, text: text, range: NSRange(location: 0, length: text.length))
     }
@@ -122,8 +122,8 @@ public class YLPTextLayout: NSObject {
         var needTruncation = false
         var truncationToken: NSAttributedString?
         var truncatedLine: YLPTextLine?
-        var lineRowsEdge: YYRowEdge?
-        let lineRowsIndex: UInt = 0
+        var lineRowsEdge = [YYRowEdge]()
+        let lineRowsIndex = [UInt]()
         var visibleRange: NSRange = NSRange(location: 0, length: 0)
         var maximumNumberOfRows: UInt = 0
         var constraintSizeIsExtended = false
@@ -1473,5 +1473,133 @@ public class YLPTextLayout: NSObject {
 //                }
 //
 //             CGContextRestoreGState(context);
+    }
+    func rect(for range: YLPTextRange?) -> CGRect {
+        var rects: [UITextSelectionRect]? = nil
+        if let range = range {
+            rects = selectionRects(for: range)
+        }
+        if (rects?.count ?? 0) == 0 {
+            return .null
+        }
+        var rectUnion = (rects?.first as? YLPTextSelectionRect)?.rect
+        for i in 1..<(rects?.count ?? 0) {
+            let rect = rects?[i] as? YLPTextSelectionRect
+            rectUnion = rectUnion?.union(rect?.rect ?? CGRect.zero)
+        }
+        return rectUnion ?? CGRect.zero
+    }
+    func selectionRects(for range: UITextRange) -> [UITextSelectionRect] {
+        return []
+    }
+    func textRange(at point: CGPoint) -> YLPTextRange? {
+        let lineIndex = self.lineIndex(for: point)
+        if lineIndex == NSNotFound {
+            return nil
+        }
+        let textPosition = self.textPosition(for: point, lineIndex: self.lineIndex(for: point))
+        if textPosition == NSNotFound {
+            return nil
+        }
+        let pos = closestPosition(to: point)
+        if pos == nil {
+            return nil
+        }
+
+        // get write direction
+        let RTL = _isRightToLeft(in: lines[lineIndex], at: point)
+        var rect: CGRect?
+        if let pos = pos {
+            rect = caretRect(for: pos)
+        }
+        if rect?.isNull ?? false {
+            return nil
+        }
+
+        if container.isVerticalForm {
+            let range = textRange(byExtending: pos, in: ((rect?.origin.y ?? 0.0) >= point.y && !RTL) ? .up : .down, offset: 1)
+            return range
+        } else {
+            let range = textRange(byExtending: pos, in: ((rect?.origin.x ?? 0.0) >= point.x && !RTL) ? .left : .right, offset: 1)
+            return range
+        }
+    }
+
+    func lineIndex(for point: CGPoint) -> Int {
+        if lines.count == 0 || rowCount == 0 {
+            return NSNotFound
+        }
+        let rowIdx = _rowIndex(forEdge: container.isVerticalForm ? point.x : point.y)
+        if rowIdx == NSNotFound {
+            return NSNotFound
+        }
+
+        let lineIdx0 = lineRowsIndex[rowIdx]
+        let lineIdx1 = rowIdx == rowCount - 1 ? UInt(lines.count - 1) : lineRowsIndex[rowIdx + 1] - 1
+        for i in lineIdx0 ... lineIdx1 {
+            
+            let bounds = (self.lines[Int(i)] as? YLPTextLine)?.bounds
+            if bounds?.contains(point) ?? false {
+                return Int(i)
+            }
+        }
+
+        return NSNotFound
+    }
+    
+    func textPosition(for point: CGPoint, lineIndex: Int) -> Int {
+        
+        return 0
+    }
+    
+    func closestPosition(to point: CGPoint) -> YLPTextPosition? {
+        
+        return nil
+    }
+    func _isRightToLeft(in line: YLPTextLine?, at point: CGPoint) -> Bool {
+        return true
+    }
+    
+    func caretRect(for position: YLPTextPosition)  -> CGRect {
+     
+        return .zero
+    }
+
+    func textRange(byExtending position: YLPTextPosition?,in direction: UITextLayoutDirection, offset: Int) -> YLPTextRange? {
+        return nil
+    }
+    
+    /// Get the row index with 'edge' distance.
+    /// - Parameter edge:  The distance from edge to the point.
+    /// If vertical form, the edge is left edge, otherwise the edge is top edge.
+    /// - Returns: Returns NSNotFound if there's no row at the point.
+    func _rowIndex(forEdge edge: CGFloat) -> Int {
+        if rowCount == 0 {
+            return NSNotFound
+        }
+        let isVertical = container.isVerticalForm
+        var lo = 0
+        var hi = rowCount - 1
+        var mid = 0
+        var rowIdx = NSNotFound
+        while lo <= hi {
+            mid = (lo + Int(hi)) / 2
+            let oneEdge = lineRowsEdge[mid]
+            if isVertical
+                ? (oneEdge.foot <= edge && edge <= oneEdge.head)
+                : (oneEdge.head <= edge && edge <= oneEdge.foot) {
+                rowIdx = mid
+                break
+            }
+            if isVertical ? (edge > oneEdge.head) : (edge < oneEdge.head) {
+                if mid == 0 {
+                    break
+                }
+                hi = UInt(mid - 1)
+            } else {
+                lo = mid + 1
+            }
+        }
+        return rowIdx
     }
 }

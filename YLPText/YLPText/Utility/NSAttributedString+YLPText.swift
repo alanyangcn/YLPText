@@ -35,6 +35,10 @@ public extension NSAttributedString {
         return attribute(name: .ylpTextBackgroundBorder, at: 0) as? YLPTextBorder
     }
 
+    @objc var ylp_shadow: NSShadow? {
+        return attribute(name: .shadow, at: 0) as? NSShadow
+    }
+    
     @objc var ylp_textShadow: YLPTextShadow? {
         return attribute(name: .ylpTextShadow, at: 0) as? YLPTextShadow
     }
@@ -49,6 +53,10 @@ public extension NSAttributedString {
 
     @objc var ylp_underlineStyle: NSUnderlineStyle {
         return attribute(name: .underlineStyle, at: 0) as? NSUnderlineStyle ?? []
+    }
+    
+    @objc var ylp_lineBreakMode: NSLineBreakMode {
+        return getLineBreakMode(at: 0) ?? .byWordWrapping
     }
 
     func attribute(name: NSAttributedString.Key, at index: Int) -> Any? {
@@ -79,6 +87,32 @@ public extension NSAttributedString {
 
         return paragraphStyle?.alignment
     }
+    
+    func getLineBreakMode(at index: Int) -> NSLineBreakMode? {
+        let paragraphStyle = yy_paragraphStyle(at: index)
+
+        return paragraphStyle?.lineBreakMode
+    }
+    
+    func ylp_plainText(for range: NSRange) -> String? {
+        if range.location == NSNotFound || range.length == NSNotFound {
+            return nil
+        }
+        var result = ""
+        if range.length == 0 {
+            return result
+        }
+        let string = self.string
+        enumerateAttribute(NSAttributedString.Key.ylpTextBackedString, in: range, options: [], using: { value, range, stop in
+            let backed = value as? YLPTextBackedString
+            if backed != nil && backed?.string != nil {
+                result += backed?.string ?? ""
+            } else {
+                result += (string as NSString).substring(with: range)
+            }
+        })
+        return result
+    }
 }
 
 public extension NSMutableAttributedString {
@@ -108,10 +142,20 @@ public extension NSMutableAttributedString {
             return attribute(name: .ylpTextBackgroundBorder, at: 0) as? YLPTextBorder
         }
     }
+    
+    override var ylp_shadow: NSShadow? {
+        set {
+            ylp_set(shadow: newValue, range: NSRange(location: 0, length: length))
+        }
+        get {
+            return attribute(name: .shadow, at: 0) as? NSShadow
+        }
+
+    }
 
     override var ylp_textShadow: YLPTextShadow? {
         set {
-            ylp_set(shadow: newValue, range: NSRange(location: 0, length: length))
+            ylp_set(textShadow: newValue, range: NSRange(location: 0, length: length))
         }
         get {
             return attribute(name: .ylpTextShadow, at: 0) as? YLPTextShadow
@@ -144,6 +188,15 @@ public extension NSMutableAttributedString {
             return getAlignment(at: 0) ?? .natural
         }
     }
+    override var ylp_lineBreakMode: NSLineBreakMode {
+        set {
+            ParagraphStyleSet(lineBreakMode: newValue, range: NSRange(location: 0, length: length))
+        }
+        get {
+            return getLineBreakMode(at: 0) ?? .byWordWrapping
+        }
+        
+    }
 
     func ylp_set(font: UIFont?, range: NSRange) {
         ylp_setAttribute(name: .font, value: font, range: range)
@@ -152,9 +205,11 @@ public extension NSMutableAttributedString {
     func ylp_set(color: UIColor?, range: NSRange) {
         ylp_setAttribute(name: .foregroundColor, value: color, range: range)
     }
-
-    func ylp_set(shadow: YLPTextShadow?, range: NSRange) {
-        ylp_setAttribute(name: .ylpTextShadow, value: shadow, range: range)
+    func ylp_set(shadow: NSShadow?, range: NSRange) {
+        ylp_setAttribute(name: .shadow, value: shadow, range: range)
+    }
+    func ylp_set(textShadow: YLPTextShadow?, range: NSRange) {
+        ylp_setAttribute(name: .ylpTextShadow, value: textShadow, range: range)
     }
 
     func ylp_set(innerShadow: YLPTextShadow?, range: NSRange) {
@@ -206,6 +261,31 @@ public extension NSMutableAttributedString {
                 style = NSParagraphStyle.default.mutableCopy() as? NSMutableParagraphStyle
             }
             style?.alignment = alignment
+            ylp_set(paragraphStyle: style, range: subRange)
+        })
+    }
+    
+    func ParagraphStyleSet(lineBreakMode: NSLineBreakMode, range: NSRange) {
+        enumerateAttribute(.paragraphStyle, in: range, options: [], using: { [self] value, subRange, _ in
+            var style: NSMutableParagraphStyle?
+            if let value = value as? NSParagraphStyle {
+                if CFGetTypeID(value) == CTParagraphStyleGetTypeID() {
+                }
+                if value.lineBreakMode == lineBreakMode {
+                    return
+                }
+                if value is NSMutableParagraphStyle {
+                    style = value as? NSMutableParagraphStyle
+                } else {
+                    style = value.mutableCopy() as? NSMutableParagraphStyle
+                }
+            } else {
+                if NSParagraphStyle.default.lineBreakMode == lineBreakMode {
+                    return
+                }
+                style = NSParagraphStyle.default.mutableCopy() as? NSMutableParagraphStyle
+            }
+            style?.lineBreakMode = lineBreakMode
             ylp_set(paragraphStyle: style, range: subRange)
         })
     }

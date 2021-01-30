@@ -13,6 +13,37 @@ enum YYTextAttributeType {
     case YYTextAttributeTypeYYText
 }
 
+class YLPTextBackedString: NSObject, NSCoding, NSCopying {
+    
+    var string: String? ///< backed string
+    
+    
+    func encode(with coder: NSCoder) {
+        coder.encode(self.string, forKey: "string")
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init()
+        string = coder.decodeObject(forKey: "string") as? String
+        
+    }
+    
+    override init() {
+        super.init()
+    }
+    
+    func copy(with zone: NSZone? = nil) -> Any {
+        return YLPTextBackedString(string: string)
+    }
+    
+    
+
+    convenience init(string: String?) {
+        self.init()
+        self.string = string
+    }
+}
+
 enum YYTextTruncationType: Int {
     case none = 0
     case start = 1
@@ -229,7 +260,7 @@ class YLPTextDecoration: NSObject, NSCoding, NSCopying {
     }
 }
  
-public typealias YLPTextAction = (UIView?, NSAttributedString?, NSRange, CGRect) -> Void
+public typealias YLPTextAction = (UIView?, NSAttributedString?, NSRange?, CGRect?) -> Void
 
 /**
  YYTextHighlight objects are used by the NSAttributedString class cluster

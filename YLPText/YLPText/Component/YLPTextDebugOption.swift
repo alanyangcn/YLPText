@@ -125,8 +125,8 @@ public class YLPTextDebugOption: NSObject, NSCopying {
 
     /// Returns the shared debug option.
     /// - Returns: The shared debug option, default is nil.
-    class func sharedDebugOption() -> YLPTextDebugOption? {
-        return nil
+    class func sharedDebugOption() -> YLPTextDebugOption {
+        return YLPTextDebugOption()
     }
 
     /// Set a debug option as shared debug option.

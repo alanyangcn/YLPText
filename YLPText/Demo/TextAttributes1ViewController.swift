@@ -120,7 +120,7 @@ class TextAttributes1ViewController: BaseViewController {
             one.ylp_font = UIFont.boldSystemFont(ofSize: 30)
             one.ylp_underlineStyle = [.thick];
             one.ylp_setTextHighlight(range: NSRange(location: 0, length: one.length), color: UIColor(red: 0.093, green: 0.492, blue: 1.000, alpha: 1.000), backgroundColor: UIColor(white: 0.000, alpha: 0.220), userInfo: nil, tap: { _,_,_,_  in
-                
+                print("tap -> ")
             }, longPress: nil)
 
             
