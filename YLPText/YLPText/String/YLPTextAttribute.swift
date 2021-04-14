@@ -51,6 +51,34 @@ enum YYTextTruncationType: Int {
     case middle = 3
 }
 
+class YLPTextBinding: NSObject, NSCoding, NSCopying {
+    func encode(with coder: NSCoder) {
+        coder.encode(deleteConfirm, forKey: "deleteConfirm")
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init()
+        deleteConfirm = coder.decodeObject(forKey: "deleteConfirm") as? Bool ?? false
+    }
+    override init() {
+        super.init()
+    }
+    func copy(with zone: NSZone? = nil) -> Any {
+        let one = YLPTextBinding()
+        one.deleteConfirm = self.deleteConfirm
+        
+        return one
+    }
+    
+    var deleteConfirm = false ///< confirm the range when delete in YYTextView
+
+    convenience init(deleteConfirm: Bool) {
+        self.init()
+        self.deleteConfirm = deleteConfirm
+    }
+ 
+}
+
 struct YLPTextLineStyle: OptionSet {
     let rawValue: Int
 

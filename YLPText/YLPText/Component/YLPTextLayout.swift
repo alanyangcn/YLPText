@@ -7,12 +7,6 @@
 
 import CoreText
 import UIKit
-struct YLPTextBorderType: OptionSet {
-    let rawValue: Int
-
-    static let backgound = YLPTextBorderType(rawValue: 1 << 0)
-    static let normal = YLPTextBorderType(rawValue: 1 << 1)
-}
 
 /// The YYTextLinePositionModifier protocol declares the required method to modify
 /// the line position in text layout progress. See `YYTextLinePositionSimpleModifier` for example.
@@ -123,7 +117,7 @@ public class YLPTextLayout: NSObject {
         var truncationToken: NSAttributedString?
         var truncatedLine: YLPTextLine?
         var lineRowsEdge = [YYRowEdge]()
-        let lineRowsIndex = [UInt]()
+        var lineRowsIndex = [UInt]()
         var visibleRange: NSRange = NSRange(location: 0, length: 0)
         var maximumNumberOfRows: UInt = 0
         var constraintSizeIsExtended = false
@@ -368,8 +362,8 @@ public class YLPTextLayout: NSObject {
 //            if lineRowsIndex == 0 {
 //                return nil
 //            }
-            var lineRowsEdge = [YYRowEdge].init(repeating: YYRowEdge(head: 0, foot: 0), count: Int(rowCount))
-            var lineRowsIndex = [UInt].init(repeating: 0, count: Int(rowCount))
+            lineRowsEdge = [YYRowEdge].init(repeating: YYRowEdge(head: 0, foot: 0), count: Int(rowCount))
+            lineRowsIndex = [UInt].init(repeating: 0, count: Int(rowCount))
             var lastRowIdx = -1
             var lastHead: CGFloat = 0
             var lastFoot: CGFloat = 0
@@ -675,7 +669,718 @@ public class YLPTextLayout: NSObject {
         return layout
     }
 
-    static func ylpTextDrawBlockBorder(layout: YLPTextLayout, context: CGContext, size: CGSize, point: CGPoint, cancel: (() -> Void)?) {
+//    - (void)setFrameSetter:(CTFramesetterRef)frameSetter {
+//        if (_frameSetter != frameSetter) {
+//            if (frameSetter) CFRetain(frameSetter);
+//            if (_frameSetter) CFRelease(_frameSetter);
+//            _frameSetter = frameSetter;
+//        }
+//    }
+//
+//    - (void)setFrame:(CTFrameRef)frame {
+//        if (_frame != frame) {
+//            if (frame) CFRetain(frame);
+//            if (_frame) CFRelease(_frame);
+//            _frame = frame;
+//        }
+//    }
+//
+//    - (void)dealloc {
+//        if (_frameSetter) CFRelease(_frameSetter);
+//        if (_frame) CFRelease(_frame);
+//        if (_lineRowsIndex) free(_lineRowsIndex);
+//        if (_lineRowsEdge) free(_lineRowsEdge);
+//    }
+
+    // MARK: - Coding
+
+    // MARK: - Copying
+
+    // MARK: - Query
+
+    /// Get the row index with 'edge' distance.
+    /// - Parameter edge:  The distance from edge to the point.
+    /// If vertical form, the edge is left edge, otherwise the edge is top edge.
+    /// - Returns: Returns NSNotFound if there's no row at the point.
+    func _rowIndex(forEdge edge: CGFloat) -> Int {
+        if rowCount == 0 {
+            return NSNotFound
+        }
+        let isVertical = container.isVerticalForm
+        var lo = 0
+        var hi = rowCount - 1
+        var mid = 0
+        var rowIdx = NSNotFound
+        while lo <= hi {
+            mid = (lo + Int(hi)) / 2
+            let oneEdge = lineRowsEdge[mid]
+            if isVertical
+                ? (oneEdge.foot <= edge && edge <= oneEdge.head)
+                : (oneEdge.head <= edge && edge <= oneEdge.foot) {
+                rowIdx = mid
+                break
+            }
+            if isVertical ? (edge > oneEdge.head) : (edge < oneEdge.head) {
+                if mid == 0 {
+                    break
+                }
+                hi = UInt(mid - 1)
+            } else {
+                lo = mid + 1
+            }
+        }
+        return rowIdx
+    }
+
+    func _closestRowIndex(forEdge edge: CGFloat) -> Int {
+        if rowCount == 0 {
+            return NSNotFound
+        }
+        var rowIdx = _rowIndex(forEdge: edge)
+        if rowIdx == NSNotFound {
+            if container.isVerticalForm {
+                if edge > lineRowsEdge[0].head {
+                    rowIdx = 0
+                } else if edge < lineRowsEdge[Int(rowCount) - 1].foot {
+                    rowIdx = Int(rowCount - 1)
+                }
+            } else {
+                if edge < lineRowsEdge[0].head {
+                    rowIdx = 0
+                } else {
+                    rowIdx = Int(rowCount - 1)
+                }
+            }
+        }
+        return rowIdx
+    }
+
+    func _run(for line: YLPTextLine?, position: YLPTextPosition?) -> CTRun? {
+        return nil
+    }
+
+    func _insideComposedCharacterSequences(line: YLPTextLine?, position: Int, block: @escaping (_ left: CGFloat, _ right: CGFloat, _ prev: Int, _ next: Int) -> Void) -> Bool {
+        return false
+    }
+
+    func _insideEmoji(line: YLPTextLine?, position: Int, block: @escaping (_ left: CGFloat, _ right: CGFloat, _ prev: Int, _ next: Int) -> Void) -> Bool {
+        return false
+    }
+
+    func _isRightToLeft(in line: YLPTextLine?, at point: CGPoint) -> Bool {
+        return true
+    }
+
+    func _correctedRange(withEdge range: YLPTextRange?) -> YLPTextRange? {
+        var range = range
+        let visibleRange = self.visibleRange
+        var start = range?.start
+        var end = range?.end
+
+        return nil
+    }
+
+    func lineIndex(forRow row: Int) -> Int {
+        if row >= rowCount {
+            return NSNotFound
+        }
+        return Int(lineRowsIndex[row])
+    }
+
+    func lineCount(forRow row: Int) -> Int {
+        if row >= rowCount {
+            return NSNotFound
+        }
+        if row == rowCount - 1 {
+            return lines.count - Int(lineRowsIndex[row])
+        } else {
+            return Int(lineRowsIndex[row + 1] - lineRowsIndex[row])
+        }
+    }
+
+    func rowIndex(forLine line: Int) -> Int {
+        if line >= lines.count {
+            return NSNotFound
+        }
+        return (lines[line] as? YLPTextLine)?.row ?? 0
+    }
+
+    func lineIndex(for point: CGPoint) -> Int {
+        if lines.count == 0 || rowCount == 0 {
+            return NSNotFound
+        }
+        let rowIdx = _rowIndex(forEdge: container.isVerticalForm ? point.x : point.y)
+        if rowIdx == NSNotFound {
+            return NSNotFound
+        }
+
+        let lineIdx0 = lineRowsIndex[rowIdx]
+        let lineIdx1 = rowIdx == rowCount - 1 ? UInt(lines.count - 1) : lineRowsIndex[rowIdx + 1] - 1
+        for i in lineIdx0 ... lineIdx1 {
+            let bounds = (lines[Int(i)] as? YLPTextLine)?.bounds
+            if bounds?.contains(point) ?? false {
+                return Int(i)
+            }
+        }
+
+        return NSNotFound
+    }
+
+    func closestLineIndex(for point: CGPoint) -> Int {
+        let isVertical = container.isVerticalForm
+        if lines.count == 0 || rowCount == 0 {
+            return NSNotFound
+        }
+        let rowIdx = _closestRowIndex(forEdge: isVertical ? point.x : point.y)
+        if rowIdx == NSNotFound {
+            return NSNotFound
+        }
+
+        let lineIdx0 = lineRowsIndex[rowIdx]
+        let lineIdx1 = rowIdx == rowCount - 1 ? UInt(lines.count - 1) : lineRowsIndex[rowIdx + 1] - 1
+        if lineIdx0 == lineIdx1 {
+            return Int(lineIdx0)
+        }
+
+        var minDistance = CGFloat.infinity
+        var minIndex = lineIdx0
+        for i in lineIdx0 ... lineIdx1 {
+            let bounds = lines[Int(i)].bounds
+            if isVertical {
+                if bounds.origin.y <= point.y && point.y <= bounds.origin.y + bounds.size.height {
+                    return Int(i)
+                }
+                var distance: CGFloat
+                if point.y < bounds.origin.y {
+                    distance = bounds.origin.y - point.y
+                } else {
+                    distance = point.y - (bounds.origin.y + bounds.size.height)
+                }
+                if distance < minDistance {
+                    minDistance = distance
+                    minIndex = i
+                }
+            } else {
+                if bounds.origin.x <= point.x && point.x <= bounds.origin.x + bounds.size.width {
+                    return Int(i)
+                }
+                var distance: CGFloat
+                if point.x < bounds.origin.x {
+                    distance = bounds.origin.x - point.x
+                } else {
+                    distance = point.x - (bounds.origin.x + bounds.size.width)
+                }
+                if distance < minDistance {
+                    minDistance = distance
+                    minIndex = i
+                }
+            }
+        }
+        return Int(minIndex)
+    }
+
+    func offset(forTextPosition position: Int, lineIndex: Int) -> CGFloat {
+        return 0
+    }
+
+    func textPosition(for point: CGPoint, lineIndex: Int) -> Int {
+        // MARK: - 待开发
+
+        return 0
+    }
+
+    func closestPosition(to point: CGPoint) -> YLPTextPosition? {
+        var point = point
+        let isVertical = container.isVerticalForm
+        // When call CTLineGetStringIndexForPosition() on ligature such as 'fi',
+        // and the point `hit` the glyph's left edge, it may get the ligature inside offset.
+        // I don't know why, maybe it's a bug of CoreText. Try to avoid it.
+        if isVertical {
+            point.y += 0.00001234
+        } else {
+            point.x += 0.00001234
+        }
+
+        let lineIndex = closestLineIndex(for: point)
+        if lineIndex == NSNotFound {
+            return nil
+        }
+        let line = lines[lineIndex]
+        var position = textPosition(for: point, lineIndex: lineIndex)
+        if position == NSNotFound {
+            position = line.range?.location ?? 0
+        }
+        if position <= visibleRange.location {
+            return YLPTextPosition(offset: visibleRange.location, affinity: .forward)
+        } else if position >= visibleRange.location + visibleRange.length {
+            return YLPTextPosition(offset: visibleRange.location + visibleRange.length, affinity: .backward)
+        }
+
+        let finalAffinity = YLPTextAffinity.forward
+        let finalAffinityDetected = false
+
+//        var bindingRange: NSRange
+//        let binding = text.attribute(NSAttributedString.Key.ylpTextBinding, at: position, longestEffectiveRange: &bindingRange, in: NSRange(location: 0, length: text.length)) as? YLPTextBinding
+//
+//        if let binding = binding , bindingRange.length > 0 {
+//            let headLineIdx = lineIndex(for: YLPTextPosition(offset: bindingRange.location))
+//            let tailLineIdx = lineIndex(for: YLPTextPosition(offset: bindingRange.location + bindingRange.length, affinity: .backward))
+//        }
+        return nil
+    }
+
+    func position(
+        for point: CGPoint,
+        oldPosition: YLPTextPosition?,
+        otherPosition: YLPTextPosition?
+    ) -> YLPTextPosition? {
+        return nil
+    }
+
+    func textRange(at point: CGPoint) -> YLPTextRange? {
+        let lineIndex = self.lineIndex(for: point)
+        if lineIndex == NSNotFound {
+            return nil
+        }
+        let textPosition = self.textPosition(for: point, lineIndex: self.lineIndex(for: point))
+        if textPosition == NSNotFound {
+            return nil
+        }
+        let pos = closestPosition(to: point)!
+
+        // get write direction
+        let RTL = _isRightToLeft(in: lines[lineIndex], at: point)
+
+        var rect = caretRect(for: pos)
+
+        if container.isVerticalForm {
+            let range = textRange(byExtending: pos, in: (rect.origin.y >= point.y && !RTL) ? .up : .down, offset: 1)
+            return range
+        } else {
+            let range = textRange(byExtending: pos, in: (rect.origin.x >= point.x && !RTL) ? .left : .right, offset: 1)
+            return range
+        }
+    }
+
+    func closestTextRange(at point: CGPoint) -> YLPTextRange? {
+        // MARK: - 待开发
+
+        return nil
+    }
+
+    func textRange(byExtending position: YLPTextPosition) -> YLPTextRange? {
+        // MARK: - 待开发
+
+        return nil
+    }
+
+    func textRange(byExtending position: YLPTextPosition, in direction: UITextLayoutDirection, offset: Int) -> YLPTextRange? {
+        // MARK: - 待开发
+
+        return nil
+    }
+
+    func lineIndex(for position: YLPTextPosition) -> Int {
+        if lines.count == 0 {
+            return NSNotFound
+        }
+        let location = position.offset
+        var lo = 0
+        var hi = lines.count - 1
+        var mid = 0
+        if position.affinity == .backward {
+            while lo <= hi {
+                mid = (lo + hi) / 2
+                let line = lines[mid]
+                let range = line.range!
+                if range.location < location && location <= range.location + range.length {
+                    return mid
+                }
+
+                if location <= range.location {
+                    hi = mid - 1
+                } else {
+                    lo = mid + 1
+                }
+            }
+        } else {
+            while lo <= hi {
+                mid = (lo + hi) / 2
+                let line = lines[mid]
+                let range = line.range!
+                if range.location <= location && location < range.location + range.length {
+                    return mid
+                }
+
+                if location <= range.location {
+                    hi = mid - 1
+                } else {
+                    lo = mid + 1
+                }
+            }
+        }
+        return NSNotFound
+    }
+
+    func linePosition(for position: YLPTextPosition) -> CGPoint {
+        // MARK: - 待开发
+
+        return .zero
+    }
+
+    func caretRect(for position: UITextPosition) -> CGRect {
+        // MARK: - 待开发
+
+        return .zero
+    }
+
+    func firstRect(for range: UITextRange) -> CGRect {
+        // MARK: - 待开发
+
+        return .null
+    }
+
+    func rect(for range: YLPTextRange) -> CGRect {
+        let rects = selectionRects(for: range)
+
+        var rectUnion = rects.first?.rect
+        for i in 1 ..< rects.count {
+            let rect = rects[i]
+            rectUnion = rectUnion?.union(rect.rect)
+        }
+        return rectUnion ?? CGRect.zero
+    }
+
+    func selectionRects(for range: UITextRange) -> [UITextSelectionRect] {
+        // MARK: - 待开发
+
+        return []
+    }
+
+    func selectionRectsWithoutStartAndEnd(for range: YLPTextRange) -> [AnyHashable]? {
+        var rects = selectionRects(for: range)
+
+        var i = 0, max = rects.count
+        while i < max {
+            let rect = rects[i]
+            if rect.containsStart || rect.containsEnd {
+                rects.remove(at: i)
+                i -= 1
+                max -= 1
+            }
+            i += 1
+        }
+        return rects
+    }
+
+    func selectionRectsWithOnlyStartAndEnd(for range: YLPTextRange) -> [AnyHashable]? {
+        var rects = selectionRects(for: range)
+        var i = 0, max = rects.count
+        while i < max {
+            let rect = rects[i]
+            if !rect.containsStart && !rect.containsEnd {
+                rects.remove(at: i)
+                i -= 1
+                max -= 1
+            }
+            i += 1
+        }
+        return rects
+    }
+
+    // MARK: - Draw
+
+    struct YLPTextDecorationType: OptionSet {
+        let rawValue: Int
+
+        static let underline = YLPTextDecorationType(rawValue: 1 << 0)
+        static let strikethrough = YLPTextDecorationType(rawValue: 1 << 1)
+    }
+
+    struct YLPTextBorderType: OptionSet {
+        let rawValue: Int
+
+        static let backgound = YLPTextBorderType(rawValue: 1 << 0)
+        static let normal = YLPTextBorderType(rawValue: 1 << 1)
+    }
+
+    private func YYTextMergeRectInSameLine(_ rect1: CGRect, _ rect2: CGRect, _ isVertical: Bool) -> CGRect {
+        if isVertical {
+            let top = min(rect1.origin.y, rect2.origin.y)
+            let bottom = max(rect1.origin.y + rect1.size.height, rect2.origin.y + rect2.size.height)
+            let width = max(rect1.size.width, rect2.size.width)
+            return CGRect(x: rect1.origin.x, y: top, width: width, height: bottom - top)
+        } else {
+            let left = min(rect1.origin.x, rect2.origin.x)
+            let right = max(rect1.origin.x + rect1.size.width, rect2.origin.x + rect2.size.width)
+            let height = max(rect1.size.height, rect2.size.height)
+            return CGRect(x: left, y: rect1.origin.y, width: right - left, height: height)
+        }
+    }
+
+    private func YYTextGetRunsMaxMetric(_ runs: CFArray?, _ xHeight: inout CGFloat, _ underlinePosition: inout CGFloat, _ lineThickness: inout CGFloat) {
+        var maxXHeight: CGFloat = 0
+        var maxUnderlinePos: CGFloat = 0
+        var maxLineThickness: CGFloat = 0
+
+        for i in 0 ..< CFArrayGetCount(runs) {
+            let run = unsafeBitCast(CFArrayGetValueAtIndex(runs, i), to: CTRun.self)
+            if let attrs = CTRunGetAttributes(run) as? [CFString: Any?] {
+                if let font = attrs[kCTFontAttributeName] {
+                    let result = font as! CTFont
+
+                    let xHeight = CTFontGetXHeight(result)
+                    if xHeight > maxXHeight {
+                        maxXHeight = xHeight
+                    }
+
+                    let underlinePos = CTFontGetUnderlinePosition(result)
+                    if underlinePos < maxUnderlinePos {
+                        maxUnderlinePos = underlinePos
+                    }
+
+                    let lineThickness = CTFontGetUnderlineThickness(result)
+                    if lineThickness > maxLineThickness {
+                        maxLineThickness = lineThickness
+                    }
+                }
+            }
+        }
+
+        if xHeight > 0 {
+            xHeight = maxXHeight
+        }
+
+        if underlinePosition > 0 {
+            underlinePosition = maxUnderlinePos
+        }
+
+        if lineThickness > 0 {
+            lineThickness = maxLineThickness
+        }
+    }
+
+    private func drawRun(_ line: YLPTextLine?, _ run: CTRun, _ context: CGContext, _ size: CGSize, _ isVertical: Bool, _ runRanges: [YLPTextRunGlyphRange]?, _ verticalOffset: CGFloat) {
+        // MARK: - 待开发
+
+        let runTextMatrix = CTRunGetTextMatrix(run)
+        let runTextMatrixIsID = runTextMatrix.isIdentity
+
+        if let runAttrs = CTRunGetAttributes(run) as? [String: Any] {
+            let a = runAttrs[NSAttributedString.Key.ylpTextGlyphTransform.rawValue]
+            if !isVertical && a != nil {
+                if !runTextMatrixIsID {
+                    context.saveGState()
+                    let trans = context.textMatrix
+                    context.textMatrix = trans.concatenating(runTextMatrix)
+                }
+
+                CTRunDraw(run, context, CFRangeMake(0, 0))
+                if !runTextMatrixIsID {
+                    context.restoreGState()
+                }
+            } else {
+            }
+        }
+    }
+
+    private func setLinePatternInContext(_ style: YLPTextLineStyle, _ width: CGFloat, _ phase: CGFloat, _ context: CGContext) {
+        context.setLineWidth(width)
+        context.setLineCap(.butt)
+        context.setLineJoin(.miter)
+
+        let dash: CGFloat = 12
+        let dot: CGFloat = 5
+        let space: CGFloat = 3
+        let pattern = YLPTextLineStyle(rawValue: style.rawValue & 0xF00)
+        if pattern == .patternSolid {
+            context.setLineDash(phase: phase, lengths: [])
+        } else if pattern == .patternDot {
+            let lengths = [width * dot, width * space]
+            context.setLineDash(phase: phase, lengths: lengths)
+        } else if pattern == .patternDash {
+            let lengths = [width * dash, width * space]
+            context.setLineDash(phase: phase, lengths: lengths)
+        } else if pattern == .patternDashDot {
+            let lengths = [width * dash, width * space, width * dot, width * space]
+            context.setLineDash(phase: phase, lengths: lengths)
+        } else if pattern == .patternDashDotDot {
+            let lengths = [width * dash, width * space, width * dot, width * space, width * dot, width * space]
+            context.setLineDash(phase: phase, lengths: lengths)
+        } else if pattern == .patternCircleDot {
+            let lengths = [width * 0, width * 3]
+            context.setLineDash(phase: phase, lengths: lengths)
+            context.setLineCap(.round)
+            context.setLineJoin(.round)
+        }
+    }
+
+    private func drawBorderRects(context: CGContext, size: CGSize, border: YLPTextBorder, rects: [CGRect], isVertical: Bool) {
+        if rects.count == 0 {
+            return
+        }
+
+        let shadow = border.shadow
+        if let color = shadow?.color {
+            context.saveGState()
+            context.setShadow(offset: shadow?.offset ?? CGSize.zero, blur: shadow?.radius ?? 0.0, color: color.cgColor)
+            context.beginTransparencyLayer(auxiliaryInfo: nil)
+        }
+
+        var paths: [UIBezierPath] = []
+        for i in 0 ..< rects.count {
+            var rect = rects[i]
+            if isVertical {
+                rect = rect.inset(by: edgeInsetRotateVertical(border.insets))
+            } else {
+                rect = rect.inset(by: border.insets)
+            }
+            rect = YLPTextCGRectPixelRound(rect)
+            let path = UIBezierPath(roundedRect: rect, cornerRadius: border.cornerRadius)
+            path.close()
+            paths.append(path)
+        }
+        if border.fillColor != nil {
+            context.saveGState()
+            if let CGColor = border.fillColor?.cgColor {
+                context.setFillColor(CGColor)
+            }
+            for path in paths {
+                context.addPath(path.cgPath)
+            }
+            context.fillPath()
+            context.restoreGState()
+        }
+
+        let type = YLPTextLineStyle(rawValue: border.lineStyle.rawValue & 0xFF)
+        if border.strokeColor != nil && border.lineStyle.rawValue > 0 && border.strokeWidth > 0 {
+            // -------------------------- single line ------------------------------//
+            context.saveGState()
+            for path in paths {
+                var bounds = path.bounds.union(CGRect(origin: CGPoint.zero, size: size))
+                bounds = bounds.insetBy(dx: -2 * border.strokeWidth, dy: -2 * border.strokeWidth)
+                context.addRect(bounds)
+                context.addPath(path.cgPath)
+                context.clip(using: .evenOdd)
+            }
+            border.strokeColor?.setStroke()
+            setLinePatternInContext(border.lineStyle, border.strokeWidth, 0, context)
+            var inset: CGFloat = -border.strokeWidth * 0.5
+            if type == .thick {
+                inset *= 2
+                context.setLineWidth(border.strokeWidth * 2)
+            }
+            var radiusDelta = -inset
+            if border.cornerRadius <= 0 {
+                radiusDelta = 0
+            }
+            context.setLineJoin(border.lineJoin)
+            for i in 0 ..< rects.count {
+                var rect = rects[i]
+                if isVertical {
+                    rect = rect.inset(by: edgeInsetRotateVertical(border.insets))
+                } else {
+                    rect = rect.inset(by: border.insets)
+                }
+                rect = rect.insetBy(dx: inset, dy: inset)
+                let path = UIBezierPath(roundedRect: rect, cornerRadius: border.cornerRadius + radiusDelta)
+                path.close()
+                context.addPath(path.cgPath)
+            }
+            context.strokePath()
+            context.restoreGState()
+
+            if type == .double {
+                context.saveGState()
+                var inset: CGFloat = -border.strokeWidth * 2
+                for i in 0 ..< rects.count {
+                    var rect = rects[i]
+                    rect = rect.inset(by: border.insets)
+                    rect = rect.insetBy(dx: inset, dy: inset)
+                    let path = UIBezierPath(roundedRect: rect, cornerRadius: border.cornerRadius + 2 * border.strokeWidth)
+                    path.close()
+
+                    var bounds = path.bounds.union(CGRect(origin: CGPoint.zero, size: size))
+                    bounds = bounds.insetBy(dx: -2 * border.strokeWidth, dy: -2 * border.strokeWidth)
+                    context.addRect(bounds)
+                    context.addPath(path.cgPath)
+                    context.clip(using: .evenOdd)
+                }
+                if let CGColor = border.strokeColor?.cgColor {
+                    context.setStrokeColor(CGColor)
+                }
+                setLinePatternInContext(border.lineStyle, border.strokeWidth, 0, context)
+                context.setLineJoin(border.lineJoin)
+                inset = -border.strokeWidth * 2.5
+                radiusDelta = border.strokeWidth * 2
+                if border.cornerRadius <= 0 {
+                    radiusDelta = 0
+                }
+                for i in 0 ..< rects.count {
+                    var rect = rects[i]
+                    rect = rect.inset(by: border.insets)
+                    rect = rect.insetBy(dx: inset, dy: inset)
+                    let path = UIBezierPath(roundedRect: rect, cornerRadius: border.cornerRadius + radiusDelta)
+                    path.close()
+                    context.addPath(path.cgPath)
+                }
+                context.strokePath()
+                context.restoreGState()
+            }
+
+            if let _ = shadow?.color {
+                context.endTransparencyLayer()
+                context.restoreGState()
+            }
+        }
+    }
+
+    private func drawLineStyle(layout: YLPTextLayout, context: CGContext, size: CGSize, point: CGPoint, cancel: (() -> Bool)?) {
+        // MARK: -  待完成
+    }
+
+    /// 绘制文字
+    /// - Parameters:
+    ///   - layout: layout
+    ///   - context: 图形上下文
+    ///   - size: size
+    ///   - point: point
+    ///   - cancel: 是否取消
+    private func drawText(layout: YLPTextLayout, context: CGContext, size: CGSize, point: CGPoint, cancel: (() -> Bool)?) {
+        context.saveGState()
+        do {
+            context.translateBy(x: point.x, y: point.y)
+            context.translateBy(x: 0, y: size.height)
+            context.scaleBy(x: 1, y: -1)
+
+            let isVertical = layout.container?.isVerticalForm ?? false
+            let verticalOffset = isVertical ? (size.width - (layout.container?.size.width ?? 0.0)) : 0
+
+            for l in 0 ..< layout.lines.count {
+                var line = layout.lines[l]
+                if let truncatedLine = layout.truncatedLine, truncatedLine.index == line.index {
+                    line = truncatedLine
+                }
+                let lineRunRanges = line.verticalRotateRange
+                let posX = line.position.x + verticalOffset
+                let posY = size.height - line.position.y
+                let runs = CTLineGetGlyphRuns(line.ctLine)
+
+                for r in 0 ..< CFArrayGetCount(runs) {
+                    let run = unsafeBitCast(CFArrayGetValueAtIndex(runs, r), to: CTRun.self)
+                    context.textMatrix = .identity
+                    context.textPosition = CGPoint(x: posX, y: posY)
+                    drawRun(line, run, context, size, isVertical, lineRunRanges?[r], verticalOffset)
+                }
+            }
+            // Use this to draw frame for test/debug.
+            // CGContextTranslateCTM(context, verticalOffset, size.height);
+            // CTFrameDraw(layout.frame, context);
+        }
+        context.restoreGState()
+    }
+
+    static func drawBlockBorder(layout: YLPTextLayout, context: CGContext, size: CGSize, point: CGPoint, cancel: (() -> Void)?) {
         context.saveGState()
         context.translateBy(x: point.x, y: point.y)
 
@@ -757,35 +1462,6 @@ public class YLPTextLayout: NSObject {
         }
 
         context.restoreGState()
-    }
-
-    func draw(in context: CGContext?, size: CGSize, point: CGPoint, view: UIView?, layer: CALayer?, debug: YLPTextDebugOption?, cancel: (() -> Bool)?) {
-        if let context = context {
-            if needDrawBlockBorder {
-            }
-            if needDrawBackgroundBorder {
-            }
-            if needDrawShadow {
-                drawShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
-            }
-            if needDrawUnderline {
-            }
-            if needDrawText {
-                drawText(layout: self, context: context, size: size, point: point, cancel: cancel)
-            }
-            if needDrawAttachment {
-            }
-            if needDrawInnerShadow {
-                drawInnerShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
-            }
-            if needDrawStrikethrough {
-            }
-            if needDrawBorder {
-                drawBorder(layout: self, context: context, size: size, point: point, type: .backgound, cancel: cancel)
-            }
-            if let debug = debug, debug.needDrawDebug() {
-            }
-        }
     }
 
     /// 绘制边框
@@ -958,169 +1634,12 @@ public class YLPTextLayout: NSObject {
         context.restoreGState()
     }
 
-    private func YYTextMergeRectInSameLine(_ rect1: CGRect, _ rect2: CGRect, _ isVertical: Bool) -> CGRect {
-        if isVertical {
-            let top = min(rect1.origin.y, rect2.origin.y)
-            let bottom = max(rect1.origin.y + rect1.size.height, rect2.origin.y + rect2.size.height)
-            let width = max(rect1.size.width, rect2.size.width)
-            return CGRect(x: rect1.origin.x, y: top, width: width, height: bottom - top)
-        } else {
-            let left = min(rect1.origin.x, rect2.origin.x)
-            let right = max(rect1.origin.x + rect1.size.width, rect2.origin.x + rect2.size.width)
-            let height = max(rect1.size.height, rect2.size.height)
-            return CGRect(x: left, y: rect1.origin.y, width: right - left, height: height)
-        }
+    func drawDecoration(layout: YLPTextLayout, context: CGContext, size: CGSize, point: CGPoint, cancel: (() -> Bool)?) {
+        // MARK: - 待完成
     }
 
-    private func drawBorderRects(context: CGContext, size: CGSize, border: YLPTextBorder, rects: [CGRect], isVertical: Bool) {
-        if rects.count == 0 {
-            return
-        }
-
-        let shadow = border.shadow
-        if let color = shadow?.color {
-            context.saveGState()
-            context.setShadow(offset: shadow?.offset ?? CGSize.zero, blur: shadow?.radius ?? 0.0, color: color.cgColor)
-            context.beginTransparencyLayer(auxiliaryInfo: nil)
-        }
-
-        var paths: [UIBezierPath] = []
-        for i in 0 ..< rects.count {
-            var rect = rects[i]
-            if isVertical {
-                rect = rect.inset(by: edgeInsetRotateVertical(border.insets))
-            } else {
-                rect = rect.inset(by: border.insets)
-            }
-            rect = YLPTextCGRectPixelRound(rect)
-            let path = UIBezierPath(roundedRect: rect, cornerRadius: border.cornerRadius)
-            path.close()
-            paths.append(path)
-        }
-        if border.fillColor != nil {
-            context.saveGState()
-            if let CGColor = border.fillColor?.cgColor {
-                context.setFillColor(CGColor)
-            }
-            for path in paths {
-                context.addPath(path.cgPath)
-            }
-            context.fillPath()
-            context.restoreGState()
-        }
-
-        let type = YLPTextLineStyle(rawValue: border.lineStyle.rawValue & 0xFF)
-        if border.strokeColor != nil && border.lineStyle.rawValue > 0 && border.strokeWidth > 0 {
-            // -------------------------- single line ------------------------------//
-            context.saveGState()
-            for path in paths {
-                var bounds = path.bounds.union(CGRect(origin: CGPoint.zero, size: size))
-                bounds = bounds.insetBy(dx: -2 * border.strokeWidth, dy: -2 * border.strokeWidth)
-                context.addRect(bounds)
-                context.addPath(path.cgPath)
-                context.clip(using: .evenOdd)
-            }
-            border.strokeColor?.setStroke()
-            setLinePatternInContext(border.lineStyle, border.strokeWidth, 0, context)
-            var inset: CGFloat = -border.strokeWidth * 0.5
-            if type == .thick {
-                inset *= 2
-                context.setLineWidth(border.strokeWidth * 2)
-            }
-            var radiusDelta = -inset
-            if border.cornerRadius <= 0 {
-                radiusDelta = 0
-            }
-            context.setLineJoin(border.lineJoin)
-            for i in 0 ..< rects.count {
-                var rect = rects[i]
-                if isVertical {
-                    rect = rect.inset(by: edgeInsetRotateVertical(border.insets))
-                } else {
-                    rect = rect.inset(by: border.insets)
-                }
-                rect = rect.insetBy(dx: inset, dy: inset)
-                let path = UIBezierPath(roundedRect: rect, cornerRadius: border.cornerRadius + radiusDelta)
-                path.close()
-                context.addPath(path.cgPath)
-            }
-            context.strokePath()
-            context.restoreGState()
-
-            if type == .double {
-                context.saveGState()
-                var inset: CGFloat = -border.strokeWidth * 2
-                for i in 0 ..< rects.count {
-                    var rect = rects[i]
-                    rect = rect.inset(by: border.insets)
-                    rect = rect.insetBy(dx: inset, dy: inset)
-                    let path = UIBezierPath(roundedRect: rect, cornerRadius: border.cornerRadius + 2 * border.strokeWidth)
-                    path.close()
-
-                    var bounds = path.bounds.union(CGRect(origin: CGPoint.zero, size: size))
-                    bounds = bounds.insetBy(dx: -2 * border.strokeWidth, dy: -2 * border.strokeWidth)
-                    context.addRect(bounds)
-                    context.addPath(path.cgPath)
-                    context.clip(using: .evenOdd)
-                }
-                if let CGColor = border.strokeColor?.cgColor {
-                    context.setStrokeColor(CGColor)
-                }
-                setLinePatternInContext(border.lineStyle, border.strokeWidth, 0, context)
-                context.setLineJoin(border.lineJoin)
-                inset = -border.strokeWidth * 2.5
-                radiusDelta = border.strokeWidth * 2
-                if border.cornerRadius <= 0 {
-                    radiusDelta = 0
-                }
-                for i in 0 ..< rects.count {
-                    var rect = rects[i]
-                    rect = rect.inset(by: border.insets)
-                    rect = rect.insetBy(dx: inset, dy: inset)
-                    let path = UIBezierPath(roundedRect: rect, cornerRadius: border.cornerRadius + radiusDelta)
-                    path.close()
-                    context.addPath(path.cgPath)
-                }
-                context.strokePath()
-                context.restoreGState()
-            }
-
-            if let _ = shadow?.color {
-                context.endTransparencyLayer()
-                context.restoreGState()
-            }
-        }
-    }
-
-    private func setLinePatternInContext(_ style: YLPTextLineStyle, _ width: CGFloat, _ phase: CGFloat, _ context: CGContext) {
-        context.setLineWidth(width)
-        context.setLineCap(.butt)
-        context.setLineJoin(.miter)
-
-        let dash: CGFloat = 12
-        let dot: CGFloat = 5
-        let space: CGFloat = 3
-        let pattern = YLPTextLineStyle(rawValue: style.rawValue & 0xF00)
-        if pattern == .patternSolid {
-            context.setLineDash(phase: phase, lengths: [])
-        } else if pattern == .patternDot {
-            let lengths = [width * dot, width * space]
-            context.setLineDash(phase: phase, lengths: lengths)
-        } else if pattern == .patternDash {
-            let lengths = [width * dash, width * space]
-            context.setLineDash(phase: phase, lengths: lengths)
-        } else if pattern == .patternDashDot {
-            let lengths = [width * dash, width * space, width * dot, width * space]
-            context.setLineDash(phase: phase, lengths: lengths)
-        } else if pattern == .patternDashDotDot {
-            let lengths = [width * dash, width * space, width * dot, width * space, width * dot, width * space]
-            context.setLineDash(phase: phase, lengths: lengths)
-        } else if pattern == .patternCircleDot {
-            let lengths = [width * 0, width * 3]
-            context.setLineDash(phase: phase, lengths: lengths)
-            context.setLineCap(.round)
-            context.setLineJoin(.round)
-        }
+    func drawAttachment(layout: YLPTextLayout, context: CGContext, size: CGSize, point: CGPoint, cancel: (() -> Bool)?) {
+        // MARK: - 待完成
     }
 
     /// 绘制阴影
@@ -1181,62 +1700,9 @@ public class YLPTextLayout: NSObject {
         context.restoreGState()
     }
 
-    /// 绘制文字
-    /// - Parameters:
-    ///   - layout: layout
-    ///   - context: 图形上下文
-    ///   - size: size
-    ///   - point: point
-    ///   - cancel: 是否取消
-    private func drawText(layout: YLPTextLayout, context: CGContext, size: CGSize, point: CGPoint, cancel: (() -> Bool)?) {
-        context.saveGState()
-        do {
-            context.translateBy(x: point.x, y: point.y)
-            context.translateBy(x: 0, y: size.height)
-            context.scaleBy(x: 1, y: -1)
-
-            let isVertical = layout.container?.isVerticalForm ?? false
-            let verticalOffset = isVertical ? (size.width - (layout.container?.size.width ?? 0.0)) : 0
-
-            for l in 0 ..< layout.lines.count {
-                var line = layout.lines[l]
-                if let truncatedLine = layout.truncatedLine, truncatedLine.index == line.index {
-                    line = truncatedLine
-                }
-                let lineRunRanges = line.verticalRotateRange
-                let posX = line.position.x + verticalOffset
-                let posY = size.height - line.position.y
-                let runs = CTLineGetGlyphRuns(line.ctLine)
-
-                for r in 0 ..< CFArrayGetCount(runs) {
-                    let run = unsafeBitCast(CFArrayGetValueAtIndex(runs, r), to: CTRun.self)
-                    context.textMatrix = .identity
-                    context.textPosition = CGPoint(x: posX, y: posY)
-                    drawRun(line, run, context, size, isVertical, lineRunRanges?[r], verticalOffset)
-                }
-            }
-            // Use this to draw frame for test/debug.
-            // CGContextTranslateCTM(context, verticalOffset, size.height);
-            // CTFrameDraw(layout.frame, context);
-        }
-        context.restoreGState()
-    }
-
-    private func drawRun(_ line: YLPTextLine?, _ run: CTRun, _ context: CGContext, _ size: CGSize, _ isVertical: Bool, _ runRanges: [YLPTextRunGlyphRange]?, _ verticalOffset: CGFloat) {
-        let runTextMatrix = CTRunGetTextMatrix(run)
-        let runTextMatrixIsID = runTextMatrix.isIdentity
-
-        if let runAttrs = CTRunGetAttributes(run) as? [String: Any?] {
-        }
-//        runAttrs[]
-//        let glyphTransformValue = CFDictionaryGetValue(runAttrs, &YYTextGlyphTransformAttributeName) as? NSValue
-
-        CTRunDraw(run, context, CFRangeMake(0, 0))
-    }
-
-    // MARK: - 已完成
-
     func drawInnerShadow(layout: YLPTextLayout, context: CGContext, size: CGSize, point: CGPoint, cancel: (() -> Bool)?) {
+        // MARK: - 已完成
+
         context.saveGState()
         context.translateBy(x: point.x, y: point.y)
         context.translateBy(x: 0, y: size.height)
@@ -1323,283 +1789,61 @@ public class YLPTextLayout: NSObject {
         context.restoreGState()
     }
 
-    func textDrawRun(line: YLPTextLine, run: CTRun, context: CGContext, size: CGSize, isVertical: Bool, runRanges: Array<Any>, verticalOffset: CGFloat) {
-        let runTextMatrix = CTRunGetTextMatrix(run)
-        let runTextMatrixIsID = runTextMatrix.isIdentity
-
-        let runAttrs = CTRunGetAttributes(run)
-//        let glyphTransformValue = CFDictionaryGetValue(runAttrs, (__bridge const void *)(NSAttributedString.Key.ylpTextGlyphTransform));
-//        if (!isVertical && !glyphTransformValue) { // draw run
-//            if (!runTextMatrixIsID) {
-//                context.saveGState();
-//                let trans = context.textMatrix;
-//                context.textMatrix = trans.concatenating(runTextMatrix);
-//            }
-//            CTRunDraw(run, context, CFRangeMake(0, 0));
-//            if (!runTextMatrixIsID) {
-//                context.restoreGState();
-//            }
-//        } else { // draw glyph
-//            let runFont = CFDictionaryGetValue(runAttrs, kCTFontAttributeName);
-//            if (!runFont) {
-//                return
-//            }
-//            let glyphCount = CTRunGetGlyphCount(run);
-//            if (glyphCount <= 0) {
-//                return
-//            }
-//
-//            CGGlyph glyphs[glyphCount];
-//            CGPoint glyphPositions[glyphCount];
-//            CTRunGetGlyphs(run, CFRangeMake(0, 0), glyphs);
-//            CTRunGetPositions(run, CFRangeMake(0, 0), glyphPositions);
-//
-//            let fillColor = (CGColorRef)CFDictionaryGetValue(runAttrs, kCTForegroundColorAttributeName);
-//            fillColor = YYTextGetCGColor(fillColor);
-//            let strokeWidth = CFDictionaryGetValue(runAttrs, kCTStrokeWidthAttributeName);
-//
-//            context.saveGState();
-//                CGContextSetFillColorWithColor(context, fillColor);
-//                if (strokeWidth == nil || strokeWidth.floatValue == 0) {
-//                    CGContextSetTextDrawingMode(context, kCGTextFill);
-//                } else {
-//                    let strokeColor = (CGColorRef)CFDictionaryGetValue(runAttrs, kCTStrokeColorAttributeName);
-//                    if (!strokeColor) {
-//                        strokeColor = fillColor
-//                    }
-//                    CGContextSetStrokeColorWithColor(context, strokeColor);
-//                    CGContextSetLineWidth(context, CTFontGetSize(runFont) * fabs(strokeWidth.floatValue * 0.01));
-//                    if (strokeWidth.floatValue > 0) {
-//                        CGContextSetTextDrawingMode(context, kCGTextStroke);
-//                    } else {
-//                        CGContextSetTextDrawingMode(context, kCGTextFillStroke);
-//                    }
-//                }
-//
-//                if (isVertical) {
-//                    CFIndex runStrIdx[glyphCount + 1];
-//                    CTRunGetStringIndices(run, CFRangeMake(0, 0), runStrIdx);
-//                    let runStrRange = CTRunGetStringRange(run);
-//                    runStrIdx[glyphCount] = runStrRange.location + runStrRange.length;
-//                    var glyphAdvances[glyphCount];
-//                    CTRunGetAdvances(run, CFRangeMake(0, 0), glyphAdvances);
-//                    let ascent = CTFontGetAscent(runFont);
-//                    let descent = CTFontGetDescent(runFont);
-//                    let glyphTransform = glyphTransformValue.CGAffineTransformValue;
-//                    let zeroPoint = CGPoint.zero;
-//
-//                    for oneRange in runRanges {
-//                        let range = oneRange.glyphRangeInRun;
-//                        let rangeMax = range.location + range.length;
-//                        let mode = oneRange.drawMode;
-//
-//                        for (NSUInteger g = range.location; g < rangeMax; g++) {
-//                            CGContextSaveGState(context)
-//                                CGContextSetTextMatrix(context, CGAffineTransformIdentity);
-//                                if (glyphTransformValue) {
-//                                    CGContextSetTextMatrix(context, glyphTransform);
-//                                }
-//                                if (mode) { // CJK glyph, need rotated
-//                                    let ofs = (ascent - descent) * 0.5;
-//                                    let w = glyphAdvances[g].width * 0.5;
-//                                    let x = x = line.position.x + verticalOffset + glyphPositions[g].y + (ofs - w);
-//                                    let y = -line.position.y + size.height - glyphPositions[g].x - (ofs + w);
-//                                    if (mode == YYTextRunGlyphDrawModeVerticalRotateMove) {
-//                                        x += w;
-//                                        y += w;
-//                                    }
-//                                    CGContextSetTextPosition(context, x, y);
-//                                } else {
-//                                    CGContextRotateCTM(context, YYTextDegreesToRadians(-90));
-//                                    CGContextSetTextPosition(context,
-//                                                             line.position.y - size.height + glyphPositions[g].x,
-//                                                             line.position.x + verticalOffset + glyphPositions[g].y);
-//                                }
-//
-//                                if (YYTextCTFontContainsColorBitmapGlyphs(runFont)) {
-//                                    CTFontDrawGlyphs(runFont, glyphs + g, &zeroPoint, 1, context);
-//                                } else {
-//                                    let cgFont = CTFontCopyGraphicsFont(runFont, NULL);
-//                                    CGContextSetFont(context, cgFont);
-//                                    CGContextSetFontSize(context, CTFontGetSize(runFont));
-//                                    CGContextShowGlyphsAtPositions(context, glyphs + g, &zeroPoint, 1);
-//                                    CGFontRelease(cgFont);
-//                                }
-//
-//                            CGContextRestoreGState(context);
-//                        }
-//                    }
-//                } else { // not vertical
-//                    if (glyphTransformValue) {
-//                        CFIndex runStrIdx[glyphCount + 1];
-//                        CTRunGetStringIndices(run, CFRangeMake(0, 0), runStrIdx);
-//                        CFRange runStrRange = CTRunGetStringRange(run);
-//                        runStrIdx[glyphCount] = runStrRange.location + runStrRange.length;
-//                        CGSize glyphAdvances[glyphCount];
-//                        CTRunGetAdvances(run, CFRangeMake(0, 0), glyphAdvances);
-//                        CGAffineTransform glyphTransform = glyphTransformValue.CGAffineTransformValue;
-//                        CGPoint zeroPoint = CGPointZero;
-//
-//                        for (NSUInteger g = 0; g < glyphCount; g++) {
-//                            CGContextSaveGState(context); {
-//                                CGContextSetTextMatrix(context, CGAffineTransformIdentity);
-//                                CGContextSetTextMatrix(context, glyphTransform);
-//                                CGContextSetTextPosition(context,
-//                                                         line.position.x + glyphPositions[g].x,
-//                                                         size.height - (line.position.y + glyphPositions[g].y));
-//
-//                                if (YYTextCTFontContainsColorBitmapGlyphs(runFont)) {
-//                                    CTFontDrawGlyphs(runFont, glyphs + g, &zeroPoint, 1, context);
-//                                } else {
-//                                    CGFontRef cgFont = CTFontCopyGraphicsFont(runFont, NULL);
-//                                    CGContextSetFont(context, cgFont);
-//                                    CGContextSetFontSize(context, CTFontGetSize(runFont));
-//                                    CGContextShowGlyphsAtPositions(context, glyphs + g, &zeroPoint, 1);
-//                                    CGFontRelease(cgFont);
-//                                }
-//                            } CGContextRestoreGState(context);
-//                        }
-//                    } else {
-//                        if (YYTextCTFontContainsColorBitmapGlyphs(runFont)) {
-//                            CTFontDrawGlyphs(runFont, glyphs, glyphPositions, glyphCount, context);
-//                        } else {
-//                            CGFontRef cgFont = CTFontCopyGraphicsFont(runFont, NULL);
-//                            CGContextSetFont(context, cgFont);
-//                            CGContextSetFontSize(context, CTFontGetSize(runFont));
-//                            CGContextShowGlyphsAtPositions(context, glyphs, glyphPositions, glyphCount);
-//                            CGFontRelease(cgFont);
-//                        }
-//                    }
-//                }
-//
-//             CGContextRestoreGState(context);
-    }
-    func rect(for range: YLPTextRange?) -> CGRect {
-        var rects: [UITextSelectionRect]? = nil
-        if let range = range {
-            rects = selectionRects(for: range)
-        }
-        if (rects?.count ?? 0) == 0 {
-            return .null
-        }
-        var rectUnion = (rects?.first as? YLPTextSelectionRect)?.rect
-        for i in 1..<(rects?.count ?? 0) {
-            let rect = rects?[i] as? YLPTextSelectionRect
-            rectUnion = rectUnion?.union(rect?.rect ?? CGRect.zero)
-        }
-        return rectUnion ?? CGRect.zero
-    }
-    func selectionRects(for range: UITextRange) -> [UITextSelectionRect] {
-        return []
-    }
-    func textRange(at point: CGPoint) -> YLPTextRange? {
-        let lineIndex = self.lineIndex(for: point)
-        if lineIndex == NSNotFound {
-            return nil
-        }
-        let textPosition = self.textPosition(for: point, lineIndex: self.lineIndex(for: point))
-        if textPosition == NSNotFound {
-            return nil
-        }
-        let pos = closestPosition(to: point)
-        if pos == nil {
-            return nil
-        }
-
-        // get write direction
-        let RTL = _isRightToLeft(in: lines[lineIndex], at: point)
-        var rect: CGRect?
-        if let pos = pos {
-            rect = caretRect(for: pos)
-        }
-        if rect?.isNull ?? false {
-            return nil
-        }
-
-        if container.isVerticalForm {
-            let range = textRange(byExtending: pos, in: ((rect?.origin.y ?? 0.0) >= point.y && !RTL) ? .up : .down, offset: 1)
-            return range
-        } else {
-            let range = textRange(byExtending: pos, in: ((rect?.origin.x ?? 0.0) >= point.x && !RTL) ? .left : .right, offset: 1)
-            return range
-        }
+    func drawDebug(layout: YLPTextLayout, context: CGContext, size: CGSize, point: CGPoint, debug: YLPTextDebugOption?) {
+        // MARK: - 待完成
     }
 
-    func lineIndex(for point: CGPoint) -> Int {
-        if lines.count == 0 || rowCount == 0 {
-            return NSNotFound
-        }
-        let rowIdx = _rowIndex(forEdge: container.isVerticalForm ? point.x : point.y)
-        if rowIdx == NSNotFound {
-            return NSNotFound
-        }
-
-        let lineIdx0 = lineRowsIndex[rowIdx]
-        let lineIdx1 = rowIdx == rowCount - 1 ? UInt(lines.count - 1) : lineRowsIndex[rowIdx + 1] - 1
-        for i in lineIdx0 ... lineIdx1 {
-            
-            let bounds = (self.lines[Int(i)] as? YLPTextLine)?.bounds
-            if bounds?.contains(point) ?? false {
-                return Int(i)
+    func draw(in context: CGContext?, size: CGSize, point: CGPoint, view: UIView?, layer: CALayer?, debug: YLPTextDebugOption?, cancel: (() -> Bool)?) {
+        if let context = context {
+            if needDrawBlockBorder {
+            }
+            if needDrawBackgroundBorder {
+            }
+            if needDrawShadow {
+                drawShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
+            }
+            if needDrawUnderline {
+            }
+            if needDrawText {
+                drawText(layout: self, context: context, size: size, point: point, cancel: cancel)
+            }
+            if needDrawAttachment {
+            }
+            if needDrawInnerShadow {
+                drawInnerShadow(layout: self, context: context, size: size, point: point, cancel: cancel)
+            }
+            if needDrawStrikethrough {
+            }
+            if needDrawBorder {
+                drawBorder(layout: self, context: context, size: size, point: point, type: .backgound, cancel: cancel)
+            }
+            if let debug = debug, debug.needDrawDebug() {
+                drawDebug(layout: self, context: context, size: size, point: point, debug: debug)
             }
         }
-
-        return NSNotFound
-    }
-    
-    func textPosition(for point: CGPoint, lineIndex: Int) -> Int {
-        
-        return 0
-    }
-    
-    func closestPosition(to point: CGPoint) -> YLPTextPosition? {
-        
-        return nil
-    }
-    func _isRightToLeft(in line: YLPTextLine?, at point: CGPoint) -> Bool {
-        return true
-    }
-    
-    func caretRect(for position: YLPTextPosition)  -> CGRect {
-     
-        return .zero
     }
 
-    func textRange(byExtending position: YLPTextPosition?,in direction: UITextLayoutDirection, offset: Int) -> YLPTextRange? {
-        return nil
+    func draw(in context: CGContext?, size: CGSize, debug: YLPTextDebugOption?
+    ) {
+        draw(in: context, size: size, point: CGPoint.zero, view: nil, layer: nil, debug: debug, cancel: nil)
     }
-    
-    /// Get the row index with 'edge' distance.
-    /// - Parameter edge:  The distance from edge to the point.
-    /// If vertical form, the edge is left edge, otherwise the edge is top edge.
-    /// - Returns: Returns NSNotFound if there's no row at the point.
-    func _rowIndex(forEdge edge: CGFloat) -> Int {
-        if rowCount == 0 {
-            return NSNotFound
-        }
-        let isVertical = container.isVerticalForm
-        var lo = 0
-        var hi = rowCount - 1
-        var mid = 0
-        var rowIdx = NSNotFound
-        while lo <= hi {
-            mid = (lo + Int(hi)) / 2
-            let oneEdge = lineRowsEdge[mid]
-            if isVertical
-                ? (oneEdge.foot <= edge && edge <= oneEdge.head)
-                : (oneEdge.head <= edge && edge <= oneEdge.foot) {
-                rowIdx = mid
-                break
-            }
-            if isVertical ? (edge > oneEdge.head) : (edge < oneEdge.head) {
-                if mid == 0 {
-                    break
-                }
-                hi = UInt(mid - 1)
-            } else {
-                lo = mid + 1
+
+    func addAttachment(to view: UIView?, layer: CALayer?) {
+        assert(Thread.isMainThread, "This method must be called on the main thread")
+
+        draw(in: nil, size: CGSize.zero, point: CGPoint.zero, view: view, layer: layer, debug: nil, cancel: nil)
+    }
+
+    func removeAttachmentFromViewAndLayer() {
+        assert(Thread.isMainThread, "This method must be called on the main thread")
+        for a in attachments {
+            if a.content is UIView {
+                let v = a.content
+                v?.removeFromSuperview()
+            } else if a.content is CALayer {
+                let l = a.content
+                l?.removeFromSuperlayer()
             }
         }
-        return rowIdx
     }
 }

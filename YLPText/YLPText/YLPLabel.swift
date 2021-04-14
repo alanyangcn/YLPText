@@ -769,7 +769,7 @@ extension YLPLabel {
             if let innerLayout = innerLayout {
                 let textRange = innerLayout.textRange(at: point)
 
-                var textRect = innerLayout.rect(for: textRange)
+                var textRect = innerLayout.rect(for: textRange!)
 
                 textRect = _convertRect(fromLayout: textRect)
                 range = textRange?.asRange()
@@ -1131,7 +1131,7 @@ extension YLPLabel {
                 var rect = CGRect.zero
                 let point = _convertPoint(toLayout: touchBeganPoint)
                 let textRange = innerLayout?.textRange(at: point)
-                var textRect = innerLayout?.rect(for: textRange)
+                var textRect = innerLayout?.rect(for: textRange!)
                 textRect = _convertRect(fromLayout: textRect ?? .zero)
                 if let textRange = textRange {
                     range = textRange.asRange()
